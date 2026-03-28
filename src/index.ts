@@ -5,7 +5,7 @@ const main = defineCommand({
   meta: {
     name: "vidjutsu",
     version: "0.1.0",
-    description: "Headless AI Generation API for Agents",
+    description: "Launch fully managed shortform channels. Give your agent powers.",
   },
   subCommands: {
     auth: () => import("./commands/auth").then((m) => m.default),
