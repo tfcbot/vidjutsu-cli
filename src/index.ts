@@ -20,6 +20,7 @@ const main = defineCommand({
     topup: () => import("./commands/topup").then((m) => m.default),
     chat: () => import("./commands/chat").then((m) => m.default),
     info: () => import("./commands/info").then((m) => m.default),
+    analytics: () => import("./commands/analytics").then((m) => m.default),
   },
 });
 
