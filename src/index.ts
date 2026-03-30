@@ -9,9 +9,6 @@ const main = defineCommand({
   },
   subCommands: {
     auth: () => import("./commands/auth").then((m) => m.default),
-    generate: () => import("./commands/generate").then((m) => m.default),
-    images: () => import("./commands/images").then((m) => m.default),
-    music: () => import("./commands/music").then((m) => m.default),
     account: () => import("./commands/account").then((m) => m.default),
     post: () => import("./commands/post").then((m) => m.default),
     campaign: () => import("./commands/campaign").then((m) => m.default),
