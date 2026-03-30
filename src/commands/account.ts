@@ -7,7 +7,7 @@ export default defineCommand({
     create: defineCommand({
       meta: { name: "create", description: "Create a managed account" },
       args: {
-        platform: { type: "string", description: "Platform (tiktok, instagram)", required: true },
+        platform: { type: "string", description: "Platform (instagram)", required: true },
         name: { type: "string", description: "Account name", required: true },
         country: { type: "string", description: "Country code" },
         niche: { type: "string", description: "Niche for warming" },
