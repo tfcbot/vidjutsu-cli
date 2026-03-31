@@ -19,6 +19,7 @@ const main = defineCommand({
     info: () => import("./commands/info").then((m) => m.default),
     analytics: () => import("./commands/analytics").then((m) => m.default),
     subscribe: () => import("./commands/subscribe").then((m) => m.default),
+    upload: () => import("./commands/upload").then((m) => m.default),
   },
 });
 
