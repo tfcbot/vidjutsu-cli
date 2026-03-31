@@ -11,6 +11,10 @@ export default defineCommand({
         name: { type: "string", description: "Account name", required: true },
         country: { type: "string", description: "Country code" },
         niche: { type: "string", description: "Niche for warming" },
+        username: { type: "string", description: "Instagram handle" },
+        bio: { type: "string", description: "Profile biography" },
+        "profile-pic": { type: "string", description: "Profile picture URL" },
+        link: { type: "string", description: "Link in bio URL" },
       },
       async run({ args }) {
         const result = await apiRequest("POST", "/v1/accounts", {
@@ -18,6 +22,10 @@ export default defineCommand({
           name: args.name,
           country: args.country,
           niche: args.niche,
+          username: args.username,
+          bio: args.bio,
+          profilePictureUrl: args["profile-pic"],
+          linkInBio: args.link,
         });
         console.log(JSON.stringify(result, null, 2));
       },
