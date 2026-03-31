@@ -4,8 +4,8 @@ import { defineCommand, runMain } from "citty";
 const main = defineCommand({
   meta: {
     name: "vidjutsu",
-    version: "0.1.0",
-    description: "Launch fully managed shortform channels. Give your agent powers.",
+    version: "0.2.0",
+    description: "Give your agent Instagram superpowers.",
   },
   subCommands: {
     auth: () => import("./commands/auth").then((m) => m.default),
@@ -18,6 +18,7 @@ const main = defineCommand({
     chat: () => import("./commands/chat").then((m) => m.default),
     info: () => import("./commands/info").then((m) => m.default),
     analytics: () => import("./commands/analytics").then((m) => m.default),
+    subscribe: () => import("./commands/subscribe").then((m) => m.default),
   },
 });
 
