@@ -6,8 +6,7 @@ set -e
 
 REPO="tfcbot/vidjutsu-cli"
 BINARY_NAME="vidjutsu"
-INSTALL_DIR="/usr/local/bin"
-FALLBACK_DIR="$HOME/.local/bin"
+INSTALL_DIR="$HOME/.local/bin"
 
 # Colors
 RED='\033[0;31m'
@@ -52,33 +51,7 @@ ensure_node() {
     return
   fi
 
-  info "Installing Node.js..."
-  case "$OS" in
-    darwin)
-      if command -v brew >/dev/null 2>&1; then
-        brew install node
-      else
-        warn "Homebrew not found — installing Node.js via official installer"
-        curl -fsSL https://nodejs.org/dist/v22.15.0/node-v22.15.0.pkg -o /tmp/node.pkg
-        sudo installer -pkg /tmp/node.pkg -target /
-        rm -f /tmp/node.pkg
-      fi
-      ;;
-    linux)
-      if command -v apt-get >/dev/null 2>&1; then
-        curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash -
-        sudo apt-get install -y nodejs
-      elif command -v dnf >/dev/null 2>&1; then
-        curl -fsSL https://rpm.nodesource.com/setup_22.x | sudo bash -
-        sudo dnf install -y nodejs
-      elif command -v pacman >/dev/null 2>&1; then
-        sudo pacman -S --noconfirm nodejs npm
-      else
-        error "Could not detect package manager. Please install Node.js manually: https://nodejs.org"
-      fi
-      ;;
-  esac
-  success "Node.js installed: $(node --version)"
+  error "Node.js is required. Install it from https://nodejs.org"
 }
 
 ensure_bun() {
@@ -168,23 +141,27 @@ install_binary() {
 
   chmod +x "$TMPFILE"
 
-  # Determine install location
-  if [ -w "$INSTALL_DIR" ]; then
-    mv "$TMPFILE" "${INSTALL_DIR}/${BINARY_NAME}"
-    success "Installed to ${INSTALL_DIR}/${BINARY_NAME}"
-  elif command -v sudo >/dev/null 2>&1; then
-    info "Installing to ${INSTALL_DIR} (requires sudo)..."
-    sudo mv "$TMPFILE" "${INSTALL_DIR}/${BINARY_NAME}"
-    success "Installed to ${INSTALL_DIR}/${BINARY_NAME}"
-  else
-    mkdir -p "$FALLBACK_DIR"
-    mv "$TMPFILE" "${FALLBACK_DIR}/${BINARY_NAME}"
-    success "Installed to ${FALLBACK_DIR}/${BINARY_NAME}"
-    case ":$PATH:" in
-      *":${FALLBACK_DIR}:"*) ;;
-      *) warn "Add ${FALLBACK_DIR} to your PATH: export PATH=\"${FALLBACK_DIR}:\$PATH\"" ;;
-    esac
-  fi
+  mkdir -p "$INSTALL_DIR"
+  mv "$TMPFILE" "${INSTALL_DIR}/${BINARY_NAME}"
+  success "Installed to ${INSTALL_DIR}/${BINARY_NAME}"
+
+  # Auto-add to PATH if needed
+  case ":$PATH:" in
+    *":${INSTALL_DIR}:"*) ;;
+    *)
+      export PATH="${INSTALL_DIR}:$PATH"
+      SHELL_RC=""
+      if [ -n "$ZSH_VERSION" ] || [ "$(basename "$SHELL")" = "zsh" ]; then
+        SHELL_RC="$HOME/.zshrc"
+      else
+        SHELL_RC="$HOME/.bashrc"
+      fi
+      if [ -n "$SHELL_RC" ] && ! grep -q '.local/bin' "$SHELL_RC" 2>/dev/null; then
+        printf '\nexport PATH="$HOME/.local/bin:$PATH"\n' >> "$SHELL_RC"
+        success "Added $INSTALL_DIR to PATH in $SHELL_RC"
+      fi
+      ;;
+  esac
 }
 
 # --- Verify ---
