@@ -8,7 +8,7 @@ const CONFIG_FILE = join(CONFIG_DIR, "config.json");
 
 interface Config {
   apiUrl: string;
-  payment?: string; // "card:<token>" or "wallet:<address>"
+  apiKey?: string;
 }
 
 function loadConfig(): Config {
@@ -27,9 +27,9 @@ export function getConfig(): Config {
   return loadConfig();
 }
 
-export function setPayment(payment: string) {
+export function setApiKey(apiKey: string) {
   const config = loadConfig();
-  config.payment = payment;
+  config.apiKey = apiKey;
   saveConfig(config);
 }
 
@@ -45,15 +45,15 @@ export async function apiRequest(
   body?: unknown
 ): Promise<unknown> {
   const config = loadConfig();
-  if (!config.payment) {
+  if (!config.apiKey) {
     throw new Error(
-      'Not authenticated. Run "vidjutsu auth --card <token>" or "vidjutsu auth --wallet <address>" first.'
+      'Not authenticated. Run "vidjutsu auth --key <your_api_key>" first.'
     );
   }
 
   const url = `${config.apiUrl}${path}`;
   const headers: Record<string, string> = {
-    "X-Payment": config.payment,
+    "X-Api-Key": config.apiKey,
     "Content-Type": "application/json",
   };
 
