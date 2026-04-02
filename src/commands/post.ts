@@ -81,7 +81,7 @@ export default defineCommand({
         id: { type: "positional", description: "Post ID", required: true },
       },
       async run({ args }) {
-        const result = await apiRequest("GET", `/v1/posts/${args.id}`);
+        const result = await apiRequest("GET", `/v1/posts?id=${args.id}`);
         console.log(JSON.stringify(result, null, 2));
       },
     }),
@@ -91,7 +91,7 @@ export default defineCommand({
         id: { type: "positional", description: "Post ID", required: true },
       },
       async run({ args }) {
-        const result = await apiRequest("DELETE", `/v1/posts/${args.id}`);
+        const result = await apiRequest("DELETE", `/v1/posts?id=${args.id}`);
         console.log(JSON.stringify(result, null, 2));
       },
     }),

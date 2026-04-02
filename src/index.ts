@@ -14,8 +14,6 @@ const main = defineCommand({
     campaign: () => import("./commands/campaign").then((m) => m.default),
     status: () => import("./commands/status").then((m) => m.default),
     balance: () => import("./commands/balance").then((m) => m.default),
-    topup: () => import("./commands/topup").then((m) => m.default),
-    chat: () => import("./commands/chat").then((m) => m.default),
     info: () => import("./commands/info").then((m) => m.default),
     analytics: () => import("./commands/analytics").then((m) => m.default),
     subscribe: () => import("./commands/subscribe").then((m) => m.default),

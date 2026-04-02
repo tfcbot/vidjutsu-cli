@@ -10,9 +10,9 @@ export default defineCommand({
     const id = args.id as string;
     let path: string;
 
-    if (id.startsWith("acc_")) path = `/v1/accounts/${id}`;
-    else if (id.startsWith("post_")) path = `/v1/posts/${id}`;
-    else if (id.startsWith("cmp_")) path = `/v1/campaigns/${id}`;
+    if (id.startsWith("acc_")) path = `/v1/accounts?id=${id}`;
+    else if (id.startsWith("post_")) path = `/v1/posts?id=${id}`;
+    else if (id.startsWith("cmp_")) path = `/v1/campaigns?id=${id}`;
     else {
       console.error("Unknown ID prefix. Expected acc_, post_, or cmp_");
       process.exit(1);

@@ -44,7 +44,7 @@ export default defineCommand({
         id: { type: "positional", description: "Account ID", required: true },
       },
       async run({ args }) {
-        const result = await apiRequest("GET", `/v1/accounts/${args.id}`);
+        const result = await apiRequest("GET", `/v1/accounts?id=${args.id}`);
         console.log(JSON.stringify(result, null, 2));
       },
     }),
@@ -54,7 +54,7 @@ export default defineCommand({
         id: { type: "positional", description: "Account ID", required: true },
       },
       async run({ args }) {
-        const result = await apiRequest("DELETE", `/v1/accounts/${args.id}`);
+        const result = await apiRequest("DELETE", `/v1/accounts?id=${args.id}`);
         console.log(JSON.stringify(result, null, 2));
       },
     }),

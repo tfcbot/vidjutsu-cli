@@ -1,5 +1,5 @@
 import { defineCommand } from "citty";
-import { apiRequest } from "../client";
+import { getConfig } from "../client";
 import { readFileSync } from "fs";
 
 export default defineCommand({
@@ -8,9 +8,13 @@ export default defineCommand({
     file: { type: "positional", description: "File path to upload", required: true },
   },
   async run({ args }) {
+    const config = getConfig();
+    if (!config.apiKey) {
+      throw new Error('Not authenticated. Run "vidjutsu auth --key <your_api_key>" first.');
+    }
+
     const filePath = args.file;
     const buffer = readFileSync(filePath);
-    const base64Data = buffer.toString("base64");
 
     // Detect content type from extension
     const ext = filePath.split(".").pop()?.toLowerCase() ?? "";
@@ -29,11 +33,25 @@ export default defineCommand({
 
     console.log(`Uploading ${filePath} (${Math.round(buffer.length / 1024)}KB, ${contentType})...`);
 
-    const result = await apiRequest("POST", "/v1/upload", {
-      base64Data,
-      contentType,
+    const res = await fetch(`${config.apiUrl}/v1/upload`, {
+      method: "POST",
+      headers: {
+        "X-Api-Key": config.apiKey,
+        "Content-Type": contentType,
+      },
+      body: buffer,
     });
 
-    console.log(JSON.stringify(result, null, 2));
+    const json = await res.json();
+
+    if (!res.ok) {
+      const msg =
+        typeof json === "object" && json !== null && "error" in json
+          ? (json as any).message ?? (json as any).error
+          : `HTTP ${res.status}`;
+      throw new Error(msg);
+    }
+
+    console.log(JSON.stringify(json, null, 2));
   },
 });
