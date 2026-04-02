@@ -15,7 +15,7 @@ export default defineCommand({
           const { readFileSync } = await import("fs");
           config = JSON.parse(readFileSync(args.config, "utf-8"));
         }
-        const result = await apiRequest("POST", "/v1/campaigns", { config });
+        const result = await apiRequest("POST", "/v1/campaigns", config);
         console.log(JSON.stringify(result, null, 2));
       },
     }),
@@ -33,27 +33,31 @@ export default defineCommand({
         id: { type: "positional", description: "Campaign ID", required: true },
       },
       async run({ args }) {
-        const result = await apiRequest("GET", `/v1/campaigns/${args.id}`);
+        const result = await apiRequest("GET", `/v1/campaigns?id=${args.id}`);
         console.log(JSON.stringify(result, null, 2));
       },
     }),
-    approve: defineCommand({
-      meta: { name: "approve", description: "Approve a campaign" },
+    execute: defineCommand({
+      meta: { name: "execute", description: "Execute a campaign" },
       args: {
         id: { type: "positional", description: "Campaign ID", required: true },
       },
       async run({ args }) {
-        const result = await apiRequest("POST", `/v1/campaigns/${args.id}/approve`);
+        const result = await apiRequest("POST", "/v1/campaigns/execute", {
+          campaignId: args.id,
+        });
         console.log(JSON.stringify(result, null, 2));
       },
     }),
     cancel: defineCommand({
-      meta: { name: "cancel", description: "Cancel a campaign" },
+      meta: { name: "cancel", description: "Cancel a campaign and refund credits" },
       args: {
         id: { type: "positional", description: "Campaign ID", required: true },
       },
       async run({ args }) {
-        const result = await apiRequest("DELETE", `/v1/campaigns/${args.id}`);
+        const result = await apiRequest("POST", "/v1/campaigns/cancel", {
+          campaignId: args.id,
+        });
         console.log(JSON.stringify(result, null, 2));
       },
     }),
