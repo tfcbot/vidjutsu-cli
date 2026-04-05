@@ -13,11 +13,13 @@ const main = defineCommand({
     post: () => import("./commands/post").then((m) => m.default),
     campaign: () => import("./commands/campaign").then((m) => m.default),
     status: () => import("./commands/status").then((m) => m.default),
+    session: () => import("./commands/session").then((m) => m.default),
     balance: () => import("./commands/balance").then((m) => m.default),
     info: () => import("./commands/info").then((m) => m.default),
     analytics: () => import("./commands/analytics").then((m) => m.default),
     subscribe: () => import("./commands/subscribe").then((m) => m.default),
     upload: () => import("./commands/upload").then((m) => m.default),
+    estimate: () => import("./commands/estimate").then((m) => m.default),
   },
 });
 
