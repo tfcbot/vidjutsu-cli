@@ -23,6 +23,12 @@ export default defineCommand({
       process.exit(0);
     }
 
+    if (json.status === "already_claimed") {
+      console.log("This session has already been claimed. Your API key was returned on the first retrieval.");
+      console.log('If you lost your key, use "vidjutsu auth --key <your_key>" to re-authenticate, or rotate it via the API.');
+      process.exit(1);
+    }
+
     console.log(`\nAPI Key:       ${json.apiKey}`);
     console.log(`Client ID:     ${json.clientId}`);
     console.log(`Balance:       ${json.balance} credits`);
