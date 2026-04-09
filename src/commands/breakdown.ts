@@ -29,7 +29,7 @@ export default defineCommand({
       await new Promise((r) => setTimeout(r, 5000));
       const status = (await apiRequest("GET", `/v1/breakdown?id=${id}`)) as Record<string, unknown>;
 
-      if (status.status === "complete" || status.status === "failed") {
+      if (status.status === "completed" || status.status === "failed") {
         console.log(JSON.stringify(status, null, 2));
         return;
       }

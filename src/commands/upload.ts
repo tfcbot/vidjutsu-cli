@@ -22,7 +22,7 @@ export default defineCommand({
           "X-Api-Key": config.apiKey,
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ url: args.url }),
+        body: JSON.stringify({ sourceUrl: args.url }),
       });
 
       const json = await res.json();
