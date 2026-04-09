@@ -2,7 +2,7 @@ import { defineCommand } from "citty";
 import { apiRequest } from "../client";
 
 export default defineCommand({
-  meta: { name: "subscribe", description: "Subscribe to VidJutsu ($59/mo)" },
+  meta: { name: "subscribe", description: "Subscribe to VidJutsu ($99/mo)" },
   args: {
     email: { type: "string", description: "Email for checkout" },
     "success-url": { type: "string", description: "Redirect URL after payment" },
