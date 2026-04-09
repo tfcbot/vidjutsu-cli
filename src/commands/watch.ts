@@ -2,7 +2,7 @@ import { defineCommand } from "citty";
 import { getConfig } from "../client";
 
 export default defineCommand({
-  meta: { name: "watch", description: "Gemini watches a video and answers your prompt" },
+  meta: { name: "watch", description: "AI watches a video and answers your prompt" },
   args: {
     "video-url": { type: "string", required: true, description: "URL of the video to watch" },
     prompt: { type: "string", required: true, description: "What to look for (freeform)" },
