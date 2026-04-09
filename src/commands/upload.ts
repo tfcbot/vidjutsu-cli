@@ -3,14 +3,44 @@ import { getConfig } from "../client";
 import { readFileSync } from "fs";
 
 export default defineCommand({
-  meta: { name: "upload", description: "Upload a file to VidJutsu CDN" },
+  meta: { name: "upload", description: "Upload a file or URL to VidJutsu CDN" },
   args: {
-    file: { type: "positional", description: "File path to upload", required: true },
+    file: { type: "positional", description: "File path to upload" },
+    url: { type: "string", description: "URL to upload via POST /v1/upload/url" },
   },
   async run({ args }) {
     const config = getConfig();
     if (!config.apiKey) {
       throw new Error('Not authenticated. Run "vidjutsu auth --key <your_api_key>" first.');
+    }
+
+    // URL-based upload
+    if (args.url) {
+      const res = await fetch(`${config.apiUrl}/v1/upload/url`, {
+        method: "POST",
+        headers: {
+          "X-Api-Key": config.apiKey,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ url: args.url }),
+      });
+
+      const json = await res.json();
+
+      if (!res.ok) {
+        const msg =
+          typeof json === "object" && json !== null && "error" in json
+            ? (json as any).message ?? (json as any).error
+            : `HTTP ${res.status}`;
+        throw new Error(msg);
+      }
+
+      console.log(JSON.stringify(json, null, 2));
+      return;
+    }
+
+    if (!args.file) {
+      throw new Error("Provide a file path or --url <url>");
     }
 
     const filePath = args.file;

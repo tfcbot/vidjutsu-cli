@@ -4,66 +4,42 @@ import { apiRequest } from "../client";
 export default defineCommand({
   meta: { name: "post", description: "Manage posts" },
   subCommands: {
-    draft: defineCommand({
-      meta: { name: "draft", description: "Create a draft post (no account required)" },
+    create: defineCommand({
+      meta: { name: "create", description: "Create a draft post" },
       args: {
-        account: { type: "string", description: "Account ID (optional for drafts)" },
+        account: { type: "string", description: "Account ID" },
         caption: { type: "string", description: "Post caption" },
-        "video-url": { type: "string", description: "Video URL" },
-      },
-      async run({ args }) {
-        const result = await apiRequest("POST", "/v1/posts", {
-          draft: true,
-          accountId: args.account,
-          caption: args.caption,
-          videoUrl: args["video-url"],
-        });
-        console.log(JSON.stringify(result, null, 2));
-      },
-    }),
-    schedule: defineCommand({
-      meta: { name: "schedule", description: "Schedule a post (account required)" },
-      args: {
-        account: { type: "string", description: "Account ID", required: true },
         "video-url": { type: "string", description: "Video URL" },
         video: { type: "string", description: "Video ID" },
+      },
+      async run({ args }) {
+        const body: Record<string, unknown> = {};
+        if (args.account) body.accountId = args.account;
+        if (args.caption) body.caption = args.caption;
+        if (args["video-url"]) body.videoUrl = args["video-url"];
+        if (args.video) body.videoId = args.video;
+
+        const result = await apiRequest("POST", "/v1/posts", body);
+        console.log(JSON.stringify(result, null, 2));
+      },
+    }),
+    edit: defineCommand({
+      meta: { name: "edit", description: "Edit a draft post" },
+      args: {
+        id: { type: "positional", description: "Post ID", required: true },
         caption: { type: "string", description: "Post caption" },
+        "video-url": { type: "string", description: "Video URL" },
+        video: { type: "string", description: "Video ID" },
+        account: { type: "string", description: "Account ID" },
       },
       async run({ args }) {
-        const result = await apiRequest("POST", "/v1/posts", {
-          accountId: args.account,
-          videoId: args.video,
-          videoUrl: args["video-url"],
-          caption: args.caption,
-        });
-        console.log(JSON.stringify(result, null, 2));
-      },
-    }),
-    assign: defineCommand({
-      meta: { name: "assign", description: "Assign a draft post to an account" },
-      args: {
-        id: { type: "positional", description: "Post ID", required: true },
-        account: { type: "string", description: "Account ID", required: true },
-      },
-      async run({ args }) {
-        const result = await apiRequest("POST", "/v1/posts/assign", {
-          postId: args.id,
-          accountId: args.account,
-        });
-        console.log(JSON.stringify(result, null, 2));
-      },
-    }),
-    duplicate: defineCommand({
-      meta: { name: "duplicate", description: "Duplicate a post (optionally to a different account)" },
-      args: {
-        id: { type: "positional", description: "Post ID", required: true },
-        account: { type: "string", description: "Target account ID" },
-      },
-      async run({ args }) {
-        const result = await apiRequest("POST", "/v1/posts/duplicate", {
-          postId: args.id,
-          accountId: args.account,
-        });
+        const body: Record<string, unknown> = {};
+        if (args.caption) body.caption = args.caption;
+        if (args["video-url"]) body.videoUrl = args["video-url"];
+        if (args.video) body.videoId = args.video;
+        if (args.account) body.accountId = args.account;
+
+        const result = await apiRequest("PUT", `/v1/posts?id=${args.id}`, body);
         console.log(JSON.stringify(result, null, 2));
       },
     }),
@@ -76,7 +52,7 @@ export default defineCommand({
       },
     }),
     get: defineCommand({
-      meta: { name: "get", description: "Get post status" },
+      meta: { name: "get", description: "Get post details" },
       args: {
         id: { type: "positional", description: "Post ID", required: true },
       },
@@ -85,8 +61,8 @@ export default defineCommand({
         console.log(JSON.stringify(result, null, 2));
       },
     }),
-    cancel: defineCommand({
-      meta: { name: "cancel", description: "Cancel a draft or scheduled post" },
+    delete: defineCommand({
+      meta: { name: "delete", description: "Delete a post" },
       args: {
         id: { type: "positional", description: "Post ID", required: true },
       },
