@@ -37,7 +37,7 @@ export default defineCommand({
       },
       async run({ args }) {
         const params: string[] = [];
-        if (args.type) params.push(`contentType=${args.type}`);
+        if (args.type) params.push(`type=${args.type}`);
         if (args.tag) {
           const [key, ...rest] = args.tag.split("=");
           params.push(`tag.${key.trim()}=${rest.join("=").trim()}`);

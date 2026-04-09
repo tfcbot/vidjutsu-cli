@@ -17,12 +17,8 @@ export default defineCommand({
       args: {
         platform: { type: "string", description: "Platform (instagram)", required: true },
         name: { type: "string", description: "Account name", required: true },
-<<<<<<< Updated upstream
-        handle: { type: "string", description: "Instagram handle" },
+        handle: { type: "string", description: "Account handle" },
         niche: { type: "string", description: "Account niche" },
-=======
-        username: { type: "string", description: "Instagram handle" },
->>>>>>> Stashed changes
         bio: { type: "string", description: "Profile biography" },
         pfp: { type: "string", description: "Profile picture URL" },
         link: { type: "string", description: "Link in bio URL" },
@@ -33,36 +29,29 @@ export default defineCommand({
           platform: args.platform,
           name: args.name,
         };
-<<<<<<< Updated upstream
         if (args.handle) body.handle = args.handle;
         if (args.niche) body.niche = args.niche;
         if (args.bio) body.bio = args.bio;
         if (args.pfp) body.pfp = args.pfp;
         if (args.link) body.linkInBio = args.link;
-=======
-        if (args.username) body.username = args.username;
-        if (args.bio) body.bio = args.bio;
-        if (args["profile-pic"]) body.profilePictureUrl = args["profile-pic"];
-        if (args.link) body.linkInBio = args.link;
         const tags = parseTags(args.tags);
         if (tags) body.tags = tags;
->>>>>>> Stashed changes
 
         const result = await apiRequest("POST", "/v1/accounts", body);
         console.log(JSON.stringify(result, null, 2));
       },
     }),
-<<<<<<< Updated upstream
     edit: defineCommand({
       meta: { name: "edit", description: "Edit an account" },
       args: {
         id: { type: "positional", description: "Account ID", required: true },
         name: { type: "string", description: "Account name" },
-        handle: { type: "string", description: "Instagram handle" },
+        handle: { type: "string", description: "Account handle" },
         niche: { type: "string", description: "Account niche" },
         bio: { type: "string", description: "Profile biography" },
         pfp: { type: "string", description: "Profile picture URL" },
         link: { type: "string", description: "Link in bio URL" },
+        tags: { type: "string", description: "Tags as key=value pairs, comma-separated" },
       },
       async run({ args }) {
         const body: Record<string, unknown> = {};
@@ -72,44 +61,8 @@ export default defineCommand({
         if (args.bio) body.bio = args.bio;
         if (args.pfp) body.pfp = args.pfp;
         if (args.link) body.linkInBio = args.link;
-=======
-    provision: defineCommand({
-      meta: { name: "provision", description: "Provision a draft account (990 credits)" },
-      args: {
-        id: { type: "positional", description: "Account ID", required: true },
-        country: { type: "string", description: "Country code" },
-        niche: { type: "string", description: "Niche for warming" },
-      },
-      async run({ args }) {
-        const body: Record<string, unknown> = { accountId: args.id };
-        if (args.country) body.country = args.country;
-        if (args.niche) body.niche = args.niche;
-
-        const result = await apiRequest("POST", "/v1/accounts/provision", body);
-        console.log(JSON.stringify(result, null, 2));
-      },
-    }),
-    edit: defineCommand({
-      meta: { name: "edit", description: "Edit a draft account profile" },
-      args: {
-        id: { type: "positional", description: "Account ID", required: true },
-        username: { type: "string", description: "Instagram handle" },
-        name: { type: "string", description: "Account name" },
-        bio: { type: "string", description: "Profile biography" },
-        "profile-pic": { type: "string", description: "Profile picture URL" },
-        link: { type: "string", description: "Link in bio URL" },
-        tags: { type: "string", description: "Tags as key=value pairs, comma-separated" },
-      },
-      async run({ args }) {
-        const body: Record<string, unknown> = {};
-        if (args.username) body.username = args.username;
-        if (args.name) body.name = args.name;
-        if (args.bio) body.bio = args.bio;
-        if (args["profile-pic"]) body.profilePictureUrl = args["profile-pic"];
-        if (args.link) body.linkInBio = args.link;
         const tags = parseTags(args.tags);
         if (tags) body.tags = tags;
->>>>>>> Stashed changes
 
         const result = await apiRequest("PUT", `/v1/accounts?id=${args.id}`, body);
         console.log(JSON.stringify(result, null, 2));
