@@ -8,7 +8,7 @@ export default defineCommand({
   },
   async run({ args }) {
     const config = getConfig();
-    const url = `${config.apiUrl}/v1/api_keys/status?session=${args.id}`;
+    const url = `${config.apiUrl}/v1/credits/status?session=${args.id}`;
 
     const res = await fetch(url);
     const json = (await res.json()) as any;
