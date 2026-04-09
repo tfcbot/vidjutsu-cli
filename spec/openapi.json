@@ -1,0 +1,2069 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "VidJutsu API",
+    "version": "2026-04-02"
+  },
+  "tags": [
+    {
+      "name": "API Keys"
+    },
+    {
+      "name": "Balance"
+    },
+    {
+      "name": "Info"
+    },
+    {
+      "name": "Pricing"
+    },
+    {
+      "name": "Subscriptions"
+    },
+    {
+      "name": "Accounts"
+    },
+    {
+      "name": "Posts"
+    },
+    {
+      "name": "Analytics"
+    },
+    {
+      "name": "Estimate"
+    },
+    {
+      "name": "Upload"
+    },
+    {
+      "name": "Analyze"
+    },
+    {
+      "name": "Scrape"
+    }
+  ],
+  "paths": {
+    "/v1/accounts": {
+      "post": {
+        "operationId": "createAccount",
+        "summary": "Create draft account",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "The request has succeeded and a new resource has been created as a result.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccountCreateResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Accounts"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AccountCreateRequest"
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "operationId": "updateAccount",
+        "summary": "Update draft account",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "explode": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccountUpdateResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Accounts"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AccountUpdateRequest"
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "operationId": "listOrGetAccounts",
+        "summary": "List accounts or get by ID",
+        "description": "Returns a single account if ?id= is provided, or a list of all accounts. Supports tag filtering via ?tag.key=value.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "explode": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/Account"
+                    },
+                    {
+                      "$ref": "#/components/schemas/AccountListResponse"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Accounts"
+        ]
+      },
+      "delete": {
+        "operationId": "deleteAccount",
+        "summary": "Delete account",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "explode": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccountDeleteResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Accounts"
+        ]
+      }
+    },
+    "/v1/accounts/provision": {
+      "post": {
+        "operationId": "provisionAccount",
+        "summary": "Provision draft account",
+        "parameters": [],
+        "responses": {
+          "202": {
+            "description": "The request has been accepted for processing, but processing has not yet completed.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccountProvisionResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Accounts"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AccountProvisionRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/analytics": {
+      "get": {
+        "operationId": "getAnalytics",
+        "summary": "Get account analytics",
+        "parameters": [
+          {
+            "name": "accountId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "explode": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccountAnalytics"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Analytics"
+        ]
+      }
+    },
+    "/v1/analytics/refresh": {
+      "post": {
+        "operationId": "refreshAnalytics",
+        "summary": "Refresh analytics",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AnalyticsRefreshResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Analytics"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "accountId": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "accountId"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/analytics/videos": {
+      "get": {
+        "operationId": "getVideoStats",
+        "summary": "Get video stats",
+        "parameters": [
+          {
+            "name": "accountId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "explode": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VideoStatsResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Analytics"
+        ]
+      }
+    },
+    "/v1/analyze": {
+      "post": {
+        "operationId": "analyzeMedia",
+        "summary": "Analyze media",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AnalyzeResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Analyze"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AnalyzeRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/api_keys": {
+      "post": {
+        "operationId": "createApiKey",
+        "summary": "Create API key",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiKeyCreateResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "API Keys"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ApiKeyCreateRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/api_keys/recover": {
+      "post": {
+        "operationId": "recoverApiKey",
+        "summary": "Recover API key",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiKeyRecoverResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "API Keys"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ApiKeyRecoverRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/api_keys/rotate": {
+      "post": {
+        "operationId": "rotateApiKey",
+        "summary": "Rotate API key",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiKeyRotateResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "API Keys"
+        ]
+      }
+    },
+    "/v1/api_keys/status": {
+      "get": {
+        "operationId": "getApiKeyStatus",
+        "summary": "Check API key status",
+        "parameters": [
+          {
+            "name": "session",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "explode": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiKeyStatusResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "API Keys"
+        ]
+      }
+    },
+    "/v1/balance": {
+      "get": {
+        "operationId": "getBalance",
+        "summary": "Get credit balance",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BalanceResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Balance"
+        ]
+      }
+    },
+    "/v1/estimate": {
+      "post": {
+        "operationId": "estimateCost",
+        "summary": "Estimate cost",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EstimateResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Estimate"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EstimateRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/info": {
+      "get": {
+        "operationId": "getInfo",
+        "summary": "API info",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InfoResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Info"
+        ]
+      }
+    },
+    "/v1/posts": {
+      "post": {
+        "operationId": "createPost",
+        "summary": "Create draft post",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "The request has succeeded and a new resource has been created as a result.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostCreateResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Posts"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PostCreateRequest"
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "operationId": "updatePost",
+        "summary": "Update draft post",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "explode": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostUpdateResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Posts"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PostUpdateRequest"
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "operationId": "listOrGetPosts",
+        "summary": "List posts or get by ID",
+        "description": "Returns a single post if ?id= is provided, or a list of posts. Filter by ?accountId= or ?tag.key=value.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "explode": false
+          },
+          {
+            "name": "accountId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "explode": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/Post"
+                    },
+                    {
+                      "$ref": "#/components/schemas/PostListResponse"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Posts"
+        ]
+      },
+      "delete": {
+        "operationId": "deletePost",
+        "summary": "Cancel post",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "explode": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostDeleteResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Posts"
+        ]
+      }
+    },
+    "/v1/posts/assign": {
+      "post": {
+        "operationId": "assignPost",
+        "summary": "Assign draft post to account",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostAssignResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Posts"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PostAssignRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/posts/duplicate": {
+      "post": {
+        "operationId": "duplicatePost",
+        "summary": "Duplicate a post",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "The request has succeeded and a new resource has been created as a result.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostDuplicateResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Posts"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PostDuplicateRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/posts/schedule": {
+      "post": {
+        "operationId": "schedulePost",
+        "summary": "Schedule draft post",
+        "parameters": [],
+        "responses": {
+          "202": {
+            "description": "The request has been accepted for processing, but processing has not yet completed.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostScheduleResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Posts"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PostScheduleRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/pricing": {
+      "get": {
+        "operationId": "getPricing",
+        "summary": "Get pricing",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PricingResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Pricing"
+        ]
+      }
+    },
+    "/v1/scrape": {
+      "post": {
+        "operationId": "scrapeContent",
+        "summary": "Scrape creator data",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "tags": [
+          "Scrape"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ScrapeRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/subscriptions": {
+      "post": {
+        "operationId": "createSubscription",
+        "summary": "Create subscription",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "tags": [
+          "Subscriptions"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SubscriptionCreateRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/upload": {
+      "post": {
+        "operationId": "uploadFile",
+        "summary": "Upload file",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "The request has succeeded and a new resource has been created as a result.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UploadResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Upload"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "*/*": {
+              "schema": {
+                "type": "string",
+                "format": "binary"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/upload/url": {
+      "post": {
+        "operationId": "uploadFromUrl",
+        "summary": "Upload from URL",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "The request has succeeded and a new resource has been created as a result.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UploadResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Upload"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UploadUrlRequest"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Account": {
+        "type": "object",
+        "required": [
+          "accountId",
+          "clientId",
+          "platform",
+          "name",
+          "status",
+          "createdAt"
+        ],
+        "properties": {
+          "accountId": {
+            "type": "string"
+          },
+          "clientId": {
+            "type": "string"
+          },
+          "campaignId": {
+            "type": "string"
+          },
+          "platform": {
+            "type": "string",
+            "enum": [
+              "instagram"
+            ]
+          },
+          "name": {
+            "type": "string"
+          },
+          "username": {
+            "type": "string"
+          },
+          "bio": {
+            "type": "string"
+          },
+          "profilePictureUrl": {
+            "type": "string"
+          },
+          "linkInBio": {
+            "type": "string"
+          },
+          "tokportalId": {
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/AccountStatus"
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Tag"
+            }
+          },
+          "createdAt": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "AccountAnalytics": {
+        "type": "object",
+        "required": [
+          "accountId",
+          "platform",
+          "followers",
+          "following",
+          "posts",
+          "engagement_rate",
+          "avg_likes",
+          "avg_comments"
+        ],
+        "properties": {
+          "accountId": {
+            "type": "string"
+          },
+          "platform": {
+            "type": "string",
+            "enum": [
+              "instagram"
+            ]
+          },
+          "followers": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "following": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "posts": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "engagement_rate": {
+            "type": "number",
+            "format": "float"
+          },
+          "avg_likes": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "avg_comments": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "AccountCreateRequest": {
+        "type": "object",
+        "required": [
+          "platform",
+          "name"
+        ],
+        "properties": {
+          "platform": {
+            "type": "string",
+            "enum": [
+              "instagram"
+            ]
+          },
+          "name": {
+            "type": "string"
+          },
+          "username": {
+            "type": "string"
+          },
+          "bio": {
+            "type": "string"
+          },
+          "profilePictureUrl": {
+            "type": "string"
+          },
+          "linkInBio": {
+            "type": "string"
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Tag"
+            }
+          }
+        }
+      },
+      "AccountCreateResponse": {
+        "type": "object",
+        "required": [
+          "id",
+          "status",
+          "creditsCharged"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "draft"
+            ]
+          },
+          "creditsCharged": {
+            "type": "number",
+            "enum": [
+              0
+            ]
+          }
+        }
+      },
+      "AccountDeleteResponse": {
+        "type": "object",
+        "required": [
+          "id",
+          "status"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "deleted"
+            ]
+          }
+        }
+      },
+      "AccountListResponse": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Account"
+            }
+          }
+        }
+      },
+      "AccountProvisionRequest": {
+        "type": "object",
+        "required": [
+          "accountId"
+        ],
+        "properties": {
+          "accountId": {
+            "type": "string"
+          },
+          "country": {
+            "type": "string"
+          },
+          "niche": {
+            "type": "string"
+          }
+        }
+      },
+      "AccountProvisionResponse": {
+        "type": "object",
+        "required": [
+          "id",
+          "status",
+          "creditsCharged"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "creating"
+            ]
+          },
+          "creditsCharged": {
+            "type": "number",
+            "enum": [
+              990
+            ]
+          }
+        }
+      },
+      "AccountStatus": {
+        "type": "string",
+        "enum": [
+          "draft",
+          "creating",
+          "active",
+          "suspended",
+          "deleted"
+        ]
+      },
+      "AccountUpdateRequest": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "bio": {
+            "type": "string"
+          },
+          "profilePictureUrl": {
+            "type": "string"
+          },
+          "linkInBio": {
+            "type": "string"
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Tag"
+            }
+          }
+        }
+      },
+      "AccountUpdateResponse": {
+        "type": "object",
+        "required": [
+          "accountId",
+          "updated"
+        ],
+        "properties": {
+          "accountId": {
+            "type": "string"
+          },
+          "updated": {
+            "type": "boolean",
+            "enum": [
+              true
+            ]
+          }
+        }
+      },
+      "AnalyticsRefreshResponse": {
+        "type": "object",
+        "required": [
+          "refreshed"
+        ],
+        "properties": {
+          "refreshed": {
+            "type": "boolean"
+          }
+        }
+      },
+      "AnalyzeRequest": {
+        "type": "object",
+        "required": [
+          "mode",
+          "mediaUrl"
+        ],
+        "properties": {
+          "mode": {
+            "type": "string",
+            "enum": [
+              "critic",
+              "verify",
+              "breakdown"
+            ]
+          },
+          "mediaUrl": {
+            "type": "string"
+          },
+          "mediaType": {
+            "type": "string"
+          },
+          "context": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "keyframeDescriptions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "prompt": {
+            "type": "string"
+          }
+        }
+      },
+      "AnalyzeResponse": {
+        "type": "object",
+        "required": [
+          "creditsCharged"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "creditsCharged": {
+            "type": "number",
+            "enum": [
+              10
+            ]
+          }
+        }
+      },
+      "ApiError": {
+        "type": "object",
+        "required": [
+          "error",
+          "message"
+        ],
+        "properties": {
+          "error": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "setup": {
+            "type": "string"
+          }
+        }
+      },
+      "ApiKeyCreateRequest": {
+        "type": "object",
+        "properties": {
+          "credits": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "email": {
+            "type": "string"
+          },
+          "successUrl": {
+            "type": "string"
+          }
+        }
+      },
+      "ApiKeyCreateResponse": {
+        "type": "object",
+        "required": [
+          "url",
+          "sessionId",
+          "credits",
+          "amount"
+        ],
+        "properties": {
+          "url": {
+            "type": "string"
+          },
+          "sessionId": {
+            "type": "string"
+          },
+          "credits": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "amount": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "ApiKeyRecoverRequest": {
+        "type": "object",
+        "required": [
+          "email"
+        ],
+        "properties": {
+          "email": {
+            "type": "string"
+          }
+        }
+      },
+      "ApiKeyRecoverResponse": {
+        "type": "object",
+        "required": [
+          "message"
+        ],
+        "properties": {
+          "message": {
+            "type": "string"
+          }
+        }
+      },
+      "ApiKeyRotateResponse": {
+        "type": "object",
+        "required": [
+          "apiKey",
+          "clientId",
+          "message"
+        ],
+        "properties": {
+          "apiKey": {
+            "type": "string"
+          },
+          "clientId": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      },
+      "ApiKeyStatusResponse": {
+        "type": "object",
+        "required": [
+          "status"
+        ],
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "completed"
+            ]
+          },
+          "apiKey": {
+            "type": "string"
+          },
+          "clientId": {
+            "type": "string"
+          },
+          "balance": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "isNew": {
+            "type": "boolean"
+          }
+        }
+      },
+      "BalanceResponse": {
+        "type": "object",
+        "required": [
+          "credits",
+          "clientId"
+        ],
+        "properties": {
+          "credits": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "clientId": {
+            "type": "string"
+          }
+        }
+      },
+      "BreakdownItem": {
+        "type": "object",
+        "required": [
+          "label",
+          "amount"
+        ],
+        "properties": {
+          "label": {
+            "type": "string"
+          },
+          "amount": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "CreditCosts": {
+        "type": "object",
+        "required": [
+          "accounts.create",
+          "accounts.provision",
+          "posts.create",
+          "posts.schedule",
+          "analyze",
+          "scrape"
+        ],
+        "properties": {
+          "accounts.create": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Create draft account (free)"
+          },
+          "accounts.provision": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Provision account via TokPortal"
+          },
+          "posts.create": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Create draft post (free)"
+          },
+          "posts.schedule": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Schedule post for publishing"
+          },
+          "analyze": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Analyze media (critic/verify/breakdown)"
+          },
+          "scrape": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Scrape creator data"
+          }
+        }
+      },
+      "EstimateRequest": {
+        "type": "object",
+        "required": [
+          "accounts",
+          "posts",
+          "platform"
+        ],
+        "properties": {
+          "accounts": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "posts": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "platform": {
+            "type": "string",
+            "enum": [
+              "instagram"
+            ]
+          }
+        }
+      },
+      "EstimateResponse": {
+        "type": "object",
+        "required": [
+          "credits",
+          "breakdown"
+        ],
+        "properties": {
+          "credits": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "breakdown": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BreakdownItem"
+            }
+          }
+        }
+      },
+      "InfoResponse": {
+        "type": "object",
+        "required": [
+          "name",
+          "version",
+          "endpoints",
+          "auth",
+          "credits"
+        ],
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "version": {
+            "type": "string"
+          },
+          "endpoints": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "auth": {},
+          "credits": {
+            "$ref": "#/components/schemas/CreditCosts"
+          }
+        }
+      },
+      "Post": {
+        "type": "object",
+        "required": [
+          "postId",
+          "clientId",
+          "status",
+          "createdAt"
+        ],
+        "properties": {
+          "postId": {
+            "type": "string"
+          },
+          "clientId": {
+            "type": "string"
+          },
+          "campaignId": {
+            "type": "string"
+          },
+          "accountId": {
+            "type": "string"
+          },
+          "videoId": {
+            "type": "string"
+          },
+          "videoUrl": {
+            "type": "string"
+          },
+          "caption": {
+            "type": "string"
+          },
+          "brief": {},
+          "scheduledAt": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "status": {
+            "$ref": "#/components/schemas/PostStatus"
+          },
+          "metrics": {},
+          "tags": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Tag"
+            }
+          },
+          "createdAt": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "PostAssignRequest": {
+        "type": "object",
+        "required": [
+          "postId",
+          "accountId"
+        ],
+        "properties": {
+          "postId": {
+            "type": "string"
+          },
+          "accountId": {
+            "type": "string"
+          }
+        }
+      },
+      "PostAssignResponse": {
+        "type": "object",
+        "required": [
+          "postId",
+          "accountId",
+          "status"
+        ],
+        "properties": {
+          "postId": {
+            "type": "string"
+          },
+          "accountId": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "assigned"
+            ]
+          }
+        }
+      },
+      "PostCreateRequest": {
+        "type": "object",
+        "properties": {
+          "accountId": {
+            "type": "string"
+          },
+          "videoId": {
+            "type": "string"
+          },
+          "videoUrl": {
+            "type": "string"
+          },
+          "caption": {
+            "type": "string"
+          },
+          "brief": {},
+          "scheduledAt": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Tag"
+            }
+          }
+        }
+      },
+      "PostCreateResponse": {
+        "type": "object",
+        "required": [
+          "id",
+          "status",
+          "creditsCharged"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "draft"
+            ]
+          },
+          "creditsCharged": {
+            "type": "number",
+            "enum": [
+              0
+            ]
+          }
+        }
+      },
+      "PostDeleteResponse": {
+        "type": "object",
+        "required": [
+          "id",
+          "status"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "cancelled"
+            ]
+          }
+        }
+      },
+      "PostDuplicateRequest": {
+        "type": "object",
+        "required": [
+          "postId"
+        ],
+        "properties": {
+          "postId": {
+            "type": "string"
+          },
+          "accountId": {
+            "type": "string"
+          }
+        }
+      },
+      "PostDuplicateResponse": {
+        "type": "object",
+        "required": [
+          "id",
+          "status",
+          "creditsCharged"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "draft"
+            ]
+          },
+          "creditsCharged": {
+            "type": "number",
+            "enum": [
+              0
+            ]
+          }
+        }
+      },
+      "PostListResponse": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Post"
+            }
+          }
+        }
+      },
+      "PostScheduleRequest": {
+        "type": "object",
+        "required": [
+          "postId"
+        ],
+        "properties": {
+          "postId": {
+            "type": "string"
+          }
+        }
+      },
+      "PostScheduleResponse": {
+        "type": "object",
+        "required": [
+          "id",
+          "status",
+          "creditsCharged"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "scheduled"
+            ]
+          },
+          "creditsCharged": {
+            "type": "number",
+            "enum": [
+              36
+            ]
+          }
+        }
+      },
+      "PostStatus": {
+        "type": "string",
+        "enum": [
+          "draft",
+          "scheduled",
+          "posting",
+          "posted",
+          "failed",
+          "cancelled"
+        ]
+      },
+      "PostUpdateRequest": {
+        "type": "object",
+        "properties": {
+          "caption": {
+            "type": "string"
+          },
+          "videoUrl": {
+            "type": "string"
+          },
+          "videoId": {
+            "type": "string"
+          },
+          "accountId": {
+            "type": "string"
+          },
+          "scheduledAt": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "brief": {},
+          "tags": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Tag"
+            }
+          }
+        }
+      },
+      "PostUpdateResponse": {
+        "type": "object",
+        "required": [
+          "postId",
+          "updated"
+        ],
+        "properties": {
+          "postId": {
+            "type": "string"
+          },
+          "updated": {
+            "type": "boolean",
+            "enum": [
+              true
+            ]
+          }
+        }
+      },
+      "PricingResponse": {
+        "type": "object",
+        "required": [
+          "subscription",
+          "pricePerCredit",
+          "maxAccounts",
+          "costs"
+        ],
+        "properties": {
+          "subscription": {
+            "$ref": "#/components/schemas/SubscriptionInfo"
+          },
+          "pricePerCredit": {
+            "type": "string"
+          },
+          "maxAccounts": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "costs": {
+            "$ref": "#/components/schemas/CreditCosts"
+          }
+        }
+      },
+      "ScrapeRequest": {
+        "type": "object",
+        "required": [
+          "platform",
+          "action"
+        ],
+        "properties": {
+          "platform": {
+            "type": "string",
+            "enum": [
+              "instagram"
+            ]
+          },
+          "action": {
+            "type": "string"
+          },
+          "params": {
+            "type": "object",
+            "additionalProperties": {}
+          }
+        }
+      },
+      "SubscriptionCreateRequest": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string"
+          },
+          "successUrl": {
+            "type": "string"
+          }
+        }
+      },
+      "SubscriptionInfo": {
+        "type": "object",
+        "required": [
+          "price",
+          "includedCredits",
+          "required"
+        ],
+        "properties": {
+          "price": {
+            "type": "string"
+          },
+          "includedCredits": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "required": {
+            "type": "boolean"
+          }
+        }
+      },
+      "Tag": {
+        "type": "object",
+        "required": [
+          "key",
+          "value"
+        ],
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "value": {
+            "type": "string"
+          }
+        }
+      },
+      "UploadResponse": {
+        "type": "object",
+        "required": [
+          "id",
+          "url",
+          "clientId"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          },
+          "clientId": {
+            "type": "string"
+          }
+        }
+      },
+      "UploadUrlRequest": {
+        "type": "object",
+        "required": [
+          "sourceUrl"
+        ],
+        "properties": {
+          "sourceUrl": {
+            "type": "string"
+          },
+          "contentType": {
+            "type": "string"
+          }
+        }
+      },
+      "VideoStat": {
+        "type": "object",
+        "required": [
+          "id",
+          "views",
+          "likes",
+          "comments",
+          "shares"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "views": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "likes": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "comments": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "shares": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "VideoStatsResponse": {
+        "type": "object",
+        "required": [
+          "accountId",
+          "videos"
+        ],
+        "properties": {
+          "accountId": {
+            "type": "string"
+          },
+          "videos": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/VideoStat"
+            }
+          }
+        }
+      }
+    }
+  },
+  "servers": [
+    {
+      "url": "https://api.vidjutsu.ai",
+      "description": "Production",
+      "variables": {}
+    }
+  ]
+}
