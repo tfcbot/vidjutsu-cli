@@ -11,7 +11,8 @@
     "build:binary:darwin-x64": "bun build src/index.ts --compile --target=bun-darwin-x64 --outfile dist/vidjutsu-darwin-x64",
     "build:binary:linux-x64": "bun build src/index.ts --compile --target=bun-linux-x64 --outfile dist/vidjutsu-linux-x64",
     "build:binary:linux-arm64": "bun build src/index.ts --compile --target=bun-linux-arm64 --outfile dist/vidjutsu-linux-arm64",
-    "dev": "bun run src/index.ts"
+    "dev": "bun run src/index.ts",
+    "sync:spec": "curl -sL https://raw.githubusercontent.com/tfcbot/vidjutsu-openapi/main/openapi/spec.json -o spec/openapi.json"
   },
   "dependencies": {
     "citty": "^0.1"
