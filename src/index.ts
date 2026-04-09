@@ -16,6 +16,8 @@ const main = defineCommand({
     upload: () => import("./commands/upload").then((m) => m.default),
     account: () => import("./commands/account").then((m) => m.default),
     post: () => import("./commands/post").then((m) => m.default),
+    reference: () => import("./commands/reference").then((m) => m.default),
+    asset: () => import("./commands/asset").then((m) => m.default),
     status: () => import("./commands/status").then((m) => m.default),
     balance: () => import("./commands/balance").then((m) => m.default),
     info: () => import("./commands/info").then((m) => m.default),

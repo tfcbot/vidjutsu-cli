@@ -16,7 +16,7 @@ export default defineCommand({
         const body: Record<string, unknown> = {};
         if (args.account) body.accountId = args.account;
         if (args.caption) body.caption = args.caption;
-        if (args["video-url"]) body.videoUrl = args["video-url"];
+        if (args["video-url"]) body.mediaUrl = args["video-url"];
         if (args.video) body.videoId = args.video;
 
         const result = await apiRequest("POST", "/v1/posts", body);
@@ -35,7 +35,7 @@ export default defineCommand({
       async run({ args }) {
         const body: Record<string, unknown> = {};
         if (args.caption) body.caption = args.caption;
-        if (args["video-url"]) body.videoUrl = args["video-url"];
+        if (args["video-url"]) body.mediaUrl = args["video-url"];
         if (args.video) body.videoId = args.video;
         if (args.account) body.accountId = args.account;
 
