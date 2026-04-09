@@ -53,7 +53,7 @@ export async function apiRequest(
 
   const url = `${config.apiUrl}${path}`;
   const headers: Record<string, string> = {
-    "X-Api-Key": config.apiKey,
+    "Authorization": `Bearer ${config.apiKey}`,
     "Content-Type": "application/json",
   };
 

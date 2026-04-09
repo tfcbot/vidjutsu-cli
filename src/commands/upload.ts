@@ -19,7 +19,7 @@ export default defineCommand({
       const res = await fetch(`${config.apiUrl}/v1/upload/url`, {
         method: "POST",
         headers: {
-          "X-Api-Key": config.apiKey,
+          "Authorization": `Bearer ${config.apiKey}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ sourceUrl: args.url }),
@@ -66,7 +66,7 @@ export default defineCommand({
     const res = await fetch(`${config.apiUrl}/v1/upload`, {
       method: "POST",
       headers: {
-        "X-Api-Key": config.apiKey,
+        "Authorization": `Bearer ${config.apiKey}`,
         "Content-Type": contentType,
       },
       body: buffer,

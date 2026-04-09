@@ -17,7 +17,7 @@ export default defineCommand({
 
     const res = await fetch(`${config.apiUrl}/v1/watch`, {
       method: "POST",
-      headers: { "X-Api-Key": config.apiKey, "Content-Type": "application/json" },
+      headers: { "Authorization": `Bearer ${config.apiKey}`, "Content-Type": "application/json" },
       body: JSON.stringify({
         mediaUrl: args["video-url"],
         prompt: args.prompt,
