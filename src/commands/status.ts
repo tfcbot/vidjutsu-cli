@@ -4,7 +4,7 @@ import { apiRequest } from "../client";
 export default defineCommand({
   meta: { name: "status", description: "Check resource status by ID" },
   args: {
-    id: { type: "positional", description: "Resource ID (acc_xxx, post_xxx)", required: true },
+    id: { type: "positional", description: "Resource ID (acc_xxx, post_xxx, ref_xxx)", required: true },
   },
   async run({ args }) {
     const id = args.id as string;
@@ -12,8 +12,9 @@ export default defineCommand({
 
     if (id.startsWith("acc_")) path = `/v1/accounts?id=${id}`;
     else if (id.startsWith("post_")) path = `/v1/posts?id=${id}`;
+    else if (id.startsWith("ref_")) path = `/v1/references?id=${id}`;
     else {
-      console.error("Unknown ID prefix. Expected acc_ or post_");
+      console.error("Unknown ID prefix. Expected acc_, post_, or ref_");
       process.exit(1);
     }
 
