@@ -59,11 +59,17 @@ export default defineCommand({
     "list": defineCommand({
       meta: { name: "list", description: "List references" },
       args: {
-        id: { type: "positional", description: "Reference ID", required: true },
+        id: { type: "string", description: "Reference ID (omit to list all)" },
         "platform": { type: "string", description: "platform" },
       },
       async run({ args }) {
-        const result = await apiRequest("GET", "/v1/references?id=" + args.id);
+        let path = "/v1/references";
+        const params = new URLSearchParams();
+        if (args["id"]) params.set("id", args["id"]);
+        if (args["platform"]) params.set("platform", args["platform"]);
+        const qs = params.toString();
+        if (qs) path += "?" + qs;
+        const result = await apiRequest("GET", path);
         console.log(JSON.stringify(result, null, 2));
       },
     }),

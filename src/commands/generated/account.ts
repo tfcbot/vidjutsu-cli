@@ -69,10 +69,15 @@ export default defineCommand({
     "list": defineCommand({
       meta: { name: "list", description: "List accounts" },
       args: {
-        id: { type: "positional", description: "Account ID", required: true },
+        id: { type: "string", description: "Account ID (omit to list all)" },
       },
       async run({ args }) {
-        const result = await apiRequest("GET", "/v1/accounts?id=" + args.id);
+        let path = "/v1/accounts";
+        const params = new URLSearchParams();
+        if (args["id"]) params.set("id", args["id"]);
+        const qs = params.toString();
+        if (qs) path += "?" + qs;
+        const result = await apiRequest("GET", path);
         console.log(JSON.stringify(result, null, 2));
       },
     }),
