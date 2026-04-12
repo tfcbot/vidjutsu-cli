@@ -9,22 +9,26 @@ const main = defineCommand({
     description: "Video intelligence API — watch, extract, transcribe, check.",
   },
   subCommands: {
+    // --- Hand-written (custom logic) ---
     auth: () => import("./commands/auth").then((m) => m.default),
-    watch: () => import("./commands/watch").then((m) => m.default),
-    extract: () => import("./commands/extract").then((m) => m.default),
-    transcribe: () => import("./commands/transcribe").then((m) => m.default),
     check: () => import("./commands/check").then((m) => m.default),
     upload: () => import("./commands/upload").then((m) => m.default),
-    account: () => import("./commands/account").then((m) => m.default),
-    post: () => import("./commands/post").then((m) => m.default),
-    reference: () => import("./commands/reference").then((m) => m.default),
-    asset: () => import("./commands/asset").then((m) => m.default),
-    status: () => import("./commands/status").then((m) => m.default),
-    balance: () => import("./commands/balance").then((m) => m.default),
-    info: () => import("./commands/info").then((m) => m.default),
     subscribe: () => import("./commands/subscribe").then((m) => m.default),
+    status: () => import("./commands/status").then((m) => m.default),
     version: () => import("./commands/version").then((m) => m.default),
     update: () => import("./commands/update").then((m) => m.default),
+
+    // --- Generated from OpenAPI spec ---
+    watch: () => import("./commands/generated/watch").then((m) => m.default),
+    extract: () => import("./commands/generated/extract").then((m) => m.default),
+    transcribe: () => import("./commands/generated/transcribe").then((m) => m.default),
+    overlay: () => import("./commands/generated/overlay").then((m) => m.default),
+    account: () => import("./commands/generated/account").then((m) => m.default),
+    post: () => import("./commands/generated/post").then((m) => m.default),
+    asset: () => import("./commands/generated/asset").then((m) => m.default),
+    reference: () => import("./commands/generated/reference").then((m) => m.default),
+    balance: () => import("./commands/generated/balance").then((m) => m.default),
+    info: () => import("./commands/generated/info").then((m) => m.default),
   },
 });
 
