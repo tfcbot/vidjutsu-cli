@@ -3,8 +3,8 @@ import { readFileSync, writeFileSync, existsSync, mkdirSync } from "fs";
 import { join } from "path";
 import { homedir } from "os";
 
-const CONFIG_DIR = join(homedir(), ".vidjutsu");
-const CONFIG_FILE = join(CONFIG_DIR, "config.json");
+export const CONFIG_DIR = join(homedir(), ".vidjutsu");
+export const CONFIG_FILE = join(CONFIG_DIR, "config.json");
 
 interface Config {
   apiUrl: string;
@@ -37,6 +37,36 @@ export function setApiUrl(url: string) {
   const config = loadConfig();
   config.apiUrl = url;
   saveConfig(config);
+}
+
+export async function publicRequest(
+  method: string,
+  path: string,
+  body?: unknown
+): Promise<unknown> {
+  const config = loadConfig();
+  const url = `${config.apiUrl}${path}`;
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+  };
+
+  const res = await fetch(url, {
+    method,
+    headers,
+    ...(body && { body: JSON.stringify(body) }),
+  });
+
+  const json = await res.json();
+
+  if (!res.ok) {
+    const msg =
+      typeof json === "object" && json !== null && "error" in json
+        ? (json as any).message ?? (json as any).error
+        : `HTTP ${res.status}`;
+    throw new Error(msg);
+  }
+
+  return json;
 }
 
 export async function apiRequest(
