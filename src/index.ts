@@ -4,7 +4,7 @@ import { defineCommand, runMain } from "citty";
 const main = defineCommand({
   meta: {
     name: "vidjutsu",
-    version: "0.2.0",
+    version: "0.3.0",
     description: "Video intelligence API — watch, extract, transcribe, check.",
   },
   subCommands: {
