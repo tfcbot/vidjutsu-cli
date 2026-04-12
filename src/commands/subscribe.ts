@@ -8,20 +8,20 @@ function sleep(ms: number): Promise<void> {
 export default defineCommand({
   meta: { name: "subscribe", description: "Subscribe to VidJutsu ($99/mo)" },
   args: {
-    email: { type: "string", description: "Email for checkout" },
+    email: { type: "string", description: "Email for checkout", required: true },
     claim: { type: "string", description: "Claim token to resume polling (claim_xxx)" },
   },
   async run({ args }) {
+    if (!args.email) {
+      console.error("Email is required. Usage: vidjutsu subscribe --email you@example.com");
+      process.exit(1);
+    }
+
     let claimToken: string;
 
     if (args.claim) {
       claimToken = args.claim;
     } else {
-      if (!args.email) {
-        console.error("Email is required. Usage: vidjutsu subscribe --email you@example.com");
-        process.exit(1);
-      }
-
       const checkout = (await publicRequest("POST", "/v1/subscribe", {
         email: args.email,
       })) as { url: string; claimToken: string };
@@ -35,7 +35,7 @@ export default defineCommand({
     console.log("Waiting for payment...");
 
     const startTime = Date.now();
-    const timeoutMs = 5 * 60 * 1000;
+    const timeoutMs = 15 * 60 * 1000;
 
     while (Date.now() - startTime < timeoutMs) {
       const elapsed = Date.now() - startTime;
