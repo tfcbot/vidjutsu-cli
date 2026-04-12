@@ -1,10 +1,11 @@
 #!/usr/bin/env node
 import { defineCommand, runMain } from "citty";
+import { VERSION } from "./version";
 
 const main = defineCommand({
   meta: {
     name: "vidjutsu",
-    version: "0.3.1",
+    version: VERSION,
     description: "Video intelligence API — watch, extract, transcribe, check.",
   },
   subCommands: {
@@ -22,7 +23,7 @@ const main = defineCommand({
     balance: () => import("./commands/balance").then((m) => m.default),
     info: () => import("./commands/info").then((m) => m.default),
     subscribe: () => import("./commands/subscribe").then((m) => m.default),
-    session: () => import("./commands/session").then((m) => m.default),
+    version: () => import("./commands/version").then((m) => m.default),
     update: () => import("./commands/update").then((m) => m.default),
   },
 });

@@ -1,6 +1,7 @@
 import { defineCommand } from "citty";
 import { execSync } from "child_process";
 import { existsSync, unlinkSync } from "fs";
+import { VERSION } from "../version";
 
 const REPO = "tfcbot/vidjutsu-cli";
 const BINARY_NAME = "vidjutsu";
@@ -12,7 +13,7 @@ function detectPlatform(): string {
 }
 
 function getCurrentVersion(): string {
-  return "0.3.1";
+  return VERSION;
 }
 
 async function getLatestVersion(): Promise<string> {
