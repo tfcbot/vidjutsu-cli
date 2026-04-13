@@ -11,11 +11,18 @@ interface Config {
   apiKey?: string;
 }
 
+const DEFAULT_API_URL = "https://api.vidjutsu.ai";
+
 function loadConfig(): Config {
   if (existsSync(CONFIG_FILE)) {
-    return JSON.parse(readFileSync(CONFIG_FILE, "utf-8"));
+    const raw = JSON.parse(readFileSync(CONFIG_FILE, "utf-8"));
+    // Always use prod URL — ignore stale dev/preview URLs from testing
+    if (!raw.apiUrl || raw.apiUrl.includes(".convex.site")) {
+      raw.apiUrl = DEFAULT_API_URL;
+    }
+    return raw;
   }
-  return { apiUrl: "https://api.vidjutsu.ai" };
+  return { apiUrl: DEFAULT_API_URL };
 }
 
 function saveConfig(config: Config) {
