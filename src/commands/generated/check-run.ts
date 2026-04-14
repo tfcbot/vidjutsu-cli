@@ -6,7 +6,7 @@ export default defineCommand({
   meta: { name: "check-run", description: "Run spec validation" },
   args: {
     "spec": { type: "string", description: "VidLang spec JSON to validate", required: true },
-    "rules": { type: "string", description: "Optional custom rules as plain text strings. Evaluated by AI" },
+    "rules": { type: "string", description: "VidLang rules config. All rules off by default — enable explicitly. E.g. { "VL013": true, "VL003": false, "VL011": { "severity": "warning" } }", required: true },
   },
   async run({ args }) {
     const body: Record<string, unknown> = {};
