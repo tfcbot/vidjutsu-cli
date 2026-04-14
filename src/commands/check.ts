@@ -9,7 +9,7 @@ export default defineCommand({
       meta: { name: "run", description: "Run spec validation" },
       args: {
         spec: { type: "string", required: true, description: "Path to spec JSON file" },
-        rules: { type: "string", description: "Custom rules (comma-separated)" },
+        rules: { type: "string", required: true, description: "Rules config JSON or comma-separated rule IDs to enable (e.g. VL013,VL011 or '{\"VL013\":true}')" },
       },
       async run({ args }) {
         const config = getConfig();
@@ -25,11 +25,19 @@ export default defineCommand({
           throw new Error(`Failed to parse spec file: ${args.spec}`);
         }
 
-        const rules = args.rules
-          ? args.rules.split(",").map((r: string) => r.trim())
-          : undefined;
+        // Parse rules: either JSON object or comma-separated IDs to enable
+        let rules: Record<string, unknown>;
+        try {
+          rules = JSON.parse(args.rules);
+        } catch {
+          // Treat as comma-separated rule IDs — enable each
+          rules = {};
+          for (const id of args.rules.split(",").map((r: string) => r.trim())) {
+            rules[id] = true;
+          }
+        }
 
-        console.log("Checking spec...");
+        console.log(`Checking spec with ${Object.keys(rules).length} rules...`);
 
         const res = await fetch(`${config.apiUrl}/v1/check`, {
           method: "POST",
@@ -57,6 +65,11 @@ export default defineCommand({
             }
           }
         }
+
+        // Summary
+        const total = data.results?.length ?? 0;
+        const passed = data.results?.filter((r: any) => r.passed !== false).length ?? 0;
+        console.log(`\n${passed}/${total} rules passed`);
       },
     }),
     rules: defineCommand({
