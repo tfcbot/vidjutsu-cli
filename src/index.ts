@@ -27,7 +27,7 @@ const main = defineCommand({
     post: () => import("./commands/generated/post").then((m) => m.default),
     asset: () => import("./commands/generated/asset").then((m) => m.default),
     reference: () => import("./commands/generated/reference").then((m) => m.default),
-    balance: () => import("./commands/generated/balance").then((m) => m.default),
+    usage: () => import("./commands/generated/usage").then((m) => m.default),
     info: () => import("./commands/generated/info").then((m) => m.default),
   },
 });
