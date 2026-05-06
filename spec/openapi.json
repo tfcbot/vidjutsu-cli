@@ -1,0 +1,3054 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "VidJutsu API",
+    "version": "2026-04-02"
+  },
+  "tags": [
+    {
+      "name": "Assets"
+    },
+    {
+      "name": "Credits"
+    },
+    {
+      "name": "API Keys"
+    },
+    {
+      "name": "Usage"
+    },
+    {
+      "name": "Info"
+    },
+    {
+      "name": "Pricing"
+    },
+    {
+      "name": "Subscriptions"
+    },
+    {
+      "name": "Auth"
+    },
+    {
+      "name": "Accounts"
+    },
+    {
+      "name": "Posts"
+    },
+    {
+      "name": "References"
+    },
+    {
+      "name": "Upload"
+    },
+    {
+      "name": "Watch"
+    },
+    {
+      "name": "Extract"
+    },
+    {
+      "name": "Transcribe"
+    },
+    {
+      "name": "Check"
+    },
+    {
+      "name": "Compliance"
+    },
+    {
+      "name": "Overlay"
+    },
+    {
+      "name": "Disclaimer"
+    }
+  ],
+  "paths": {
+    "/v1/accounts": {
+      "post": {
+        "operationId": "createAccount",
+        "summary": "Create account",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "The request has succeeded and a new resource has been created as a result.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccountCreateResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Accounts"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AccountCreateRequest"
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "operationId": "updateAccount",
+        "summary": "Update account",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "explode": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccountUpdateResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Accounts"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AccountUpdateRequest"
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "operationId": "listOrGetAccounts",
+        "summary": "List accounts or get by ID",
+        "description": "Returns a single account if ?id= is provided, or a list of all accounts. Supports tag filtering via ?tag.key=value.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "explode": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/Account"
+                    },
+                    {
+                      "$ref": "#/components/schemas/AccountListResponse"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Accounts"
+        ]
+      },
+      "delete": {
+        "operationId": "deleteAccount",
+        "summary": "Delete account",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "explode": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccountDeleteResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Accounts"
+        ]
+      }
+    },
+    "/v1/api_keys/recover": {
+      "post": {
+        "operationId": "recoverApiKey",
+        "summary": "Recover API key",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiKeyRecoverResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "API Keys"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ApiKeyRecoverRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/api_keys/rotate": {
+      "post": {
+        "operationId": "rotateApiKey",
+        "summary": "Rotate API key",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiKeyRotateResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "API Keys"
+        ]
+      }
+    },
+    "/v1/assets": {
+      "post": {
+        "operationId": "createAsset",
+        "summary": "Create asset from existing URL",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "The request has succeeded and a new resource has been created as a result.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AssetCreateResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Assets"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AssetCreateRequest"
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "operationId": "updateAsset",
+        "summary": "Update asset metadata",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "explode": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AssetUpdateResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Assets"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AssetUpdateRequest"
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "operationId": "listOrGetAssets",
+        "summary": "List assets or get by ID",
+        "description": "Returns a single asset if ?id= is provided, or a list. Filter by ?type=video or ?tag.key=value.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "explode": false
+          },
+          {
+            "name": "type",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "explode": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/Asset"
+                    },
+                    {
+                      "$ref": "#/components/schemas/AssetListResponse"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Assets"
+        ]
+      },
+      "delete": {
+        "operationId": "deleteAsset",
+        "summary": "Delete asset (soft)",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "explode": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AssetDeleteResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Assets"
+        ]
+      }
+    },
+    "/v1/auth/verify/confirm": {
+      "post": {
+        "operationId": "confirmVerification",
+        "summary": "Confirm email verification code",
+        "description": "Validates the 6-digit code and returns API credentials if correct. Code expires after 5 minutes.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VerifyConfirmResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Auth"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VerifyConfirmBody"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/auth/verify/request": {
+      "post": {
+        "operationId": "requestVerification",
+        "summary": "Request email verification code",
+        "description": "Sends a 6-digit verification code to the email. Always returns sent: true to prevent email enumeration.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VerifyRequestResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Auth"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VerifyRequestBody"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/check": {
+      "post": {
+        "operationId": "checkSpec",
+        "summary": "Check spec",
+        "description": "Validate a VidLang spec against enabled rules. Rules are off by default — caller must enable at least one. 5 credits.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CheckResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Check"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CheckRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/check/rules": {
+      "get": {
+        "operationId": "getCheckRules",
+        "summary": "Get check rules",
+        "description": "Load per-client custom rules. 0 credits.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CheckRulesResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Check"
+        ]
+      },
+      "put": {
+        "operationId": "updateCheckRules",
+        "summary": "Update check rules",
+        "description": "Save per-client custom rules. 0 credits.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CheckRulesResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Check"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CheckRulesUpdateRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/compliance/prompt": {
+      "post": {
+        "operationId": "checkCompliancePrompt",
+        "summary": "Check prompt compliance",
+        "description": "Scan a caption, ad copy, draft script, or other text against a platform's current TOS / Community Guidelines. Returns a risk score with cited policy clauses. Informational only, not legal advice. 100/day rate limit.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ComplianceCheckResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Compliance"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CompliancePromptRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/compliance/video": {
+      "post": {
+        "operationId": "checkComplianceVideo",
+        "summary": "Check video compliance",
+        "description": "Scan a video against a platform's current TOS / Community Guidelines. Returns a risk score with cited policy clauses. Informational only, not legal advice. 20/day rate limit.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ComplianceCheckResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Compliance"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ComplianceVideoRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/credits/status": {
+      "get": {
+        "operationId": "getCheckoutStatus",
+        "summary": "Check checkout status",
+        "parameters": [
+          {
+            "name": "session",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "explode": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiKeyStatusResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Credits"
+        ]
+      }
+    },
+    "/v1/disclaimer": {
+      "post": {
+        "operationId": "createDisclaimer",
+        "summary": "Burn fine-print disclaimer onto video",
+        "description": "Burns a fine-print disclaimer centered at the bottom of a video using FFmpeg ASS subtitles. Use for FTC-style disclosures like results-not-typical, paid-endorsement, or AI-generated labels. Returns CDN URL of the result. 5 credits.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DisclaimerResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Disclaimer"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DisclaimerRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/extract": {
+      "post": {
+        "operationId": "extractMedia",
+        "summary": "Extract from media",
+        "description": "Pull frames, audio, and metadata from a video via server-side processing. 5 credits.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExtractResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Extract"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExtractRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/info": {
+      "get": {
+        "operationId": "getInfo",
+        "summary": "API info",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InfoResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Info"
+        ]
+      }
+    },
+    "/v1/overlay": {
+      "post": {
+        "operationId": "createOverlay",
+        "summary": "Burn text overlay onto video",
+        "description": "Burns text overlay onto a video using FFmpeg ASS subtitles. Supports TikTok-safe zones, configurable font size, stroke thickness, and top/center/bottom positioning. Returns CDN URL of the result. 5 credits.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OverlayResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Overlay"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OverlayRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/posts": {
+      "post": {
+        "operationId": "createPost",
+        "summary": "Create post",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "The request has succeeded and a new resource has been created as a result.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostCreateResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Posts"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PostCreateRequest"
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "operationId": "updatePost",
+        "summary": "Update post",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "explode": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostUpdateResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Posts"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PostUpdateRequest"
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "operationId": "listOrGetPosts",
+        "summary": "List posts or get by ID",
+        "description": "Returns a single post if ?id= is provided, or a list of posts. Filter by ?accountId= or ?tag.key=value.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "explode": false
+          },
+          {
+            "name": "accountId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "explode": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/Post"
+                    },
+                    {
+                      "$ref": "#/components/schemas/PostListResponse"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Posts"
+        ]
+      },
+      "delete": {
+        "operationId": "deletePost",
+        "summary": "Delete post",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "explode": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostDeleteResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Posts"
+        ]
+      }
+    },
+    "/v1/pricing": {
+      "get": {
+        "operationId": "getPricing",
+        "summary": "Get pricing",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PricingResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Pricing"
+        ]
+      }
+    },
+    "/v1/references": {
+      "post": {
+        "operationId": "createReference",
+        "summary": "Create reference",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "The request has succeeded and a new resource has been created as a result.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReferenceCreateResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "References"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReferenceCreateRequest"
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "operationId": "updateReference",
+        "summary": "Update reference",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "explode": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReferenceUpdateResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "References"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReferenceUpdateRequest"
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "operationId": "listOrGetReferences",
+        "summary": "List references or get by ID",
+        "description": "Returns a single reference if ?id= is provided, or a list. Filter by ?platform= or ?tag.key=value.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "explode": false
+          },
+          {
+            "name": "platform",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "explode": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/Reference"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ReferenceListResponse"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "References"
+        ]
+      },
+      "delete": {
+        "operationId": "deleteReference",
+        "summary": "Delete reference",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "explode": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReferenceDeleteResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "References"
+        ]
+      }
+    },
+    "/v1/subscribe": {
+      "post": {
+        "operationId": "createSubscription",
+        "summary": "Create subscription",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubscriptionCreateResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Subscriptions"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SubscriptionCreateRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/transcribe": {
+      "post": {
+        "operationId": "transcribeMedia",
+        "summary": "Transcribe media",
+        "description": "Speech-to-text with word-level timing. 10 credits.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TranscribeResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Transcribe"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TranscribeRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/upload": {
+      "post": {
+        "operationId": "uploadFile",
+        "summary": "Upload file",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "The request has succeeded and a new resource has been created as a result.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UploadResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Upload"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "*/*": {
+              "schema": {
+                "type": "string",
+                "format": "binary"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/upload/url": {
+      "post": {
+        "operationId": "uploadFromUrl",
+        "summary": "Upload from URL",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "The request has succeeded and a new resource has been created as a result.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UploadResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Upload"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UploadUrlRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/usage": {
+      "get": {
+        "operationId": "getUsage",
+        "summary": "Get daily usage",
+        "description": "Returns remaining rate-limit capacity per endpoint for the caller. Resets daily at 00:00 UTC.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UsageResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Usage"
+        ]
+      }
+    },
+    "/v1/watch": {
+      "post": {
+        "operationId": "watchMedia",
+        "summary": "Watch media",
+        "description": "AI watches a video or image and answers your freeform prompt. Returns structured JSON. 10 credits.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WatchResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Watch"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WatchRequest"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "security": [
+    {
+      "BearerAuth": []
+    }
+  ],
+  "components": {
+    "schemas": {
+      "Account": {
+        "type": "object",
+        "required": [
+          "accountId",
+          "clientId",
+          "platform",
+          "name",
+          "status",
+          "createdAt"
+        ],
+        "properties": {
+          "accountId": {
+            "type": "string"
+          },
+          "clientId": {
+            "type": "string"
+          },
+          "platform": {
+            "type": "string",
+            "enum": [
+              "instagram"
+            ]
+          },
+          "name": {
+            "type": "string"
+          },
+          "handle": {
+            "type": "string"
+          },
+          "bio": {
+            "type": "string"
+          },
+          "pfp": {
+            "type": "string"
+          },
+          "niche": {
+            "type": "string"
+          },
+          "linkInBio": {
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/AccountStatus"
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Tag"
+            }
+          },
+          "createdAt": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "AccountCreateRequest": {
+        "type": "object",
+        "required": [
+          "platform",
+          "name"
+        ],
+        "properties": {
+          "platform": {
+            "type": "string",
+            "enum": [
+              "instagram"
+            ]
+          },
+          "name": {
+            "type": "string"
+          },
+          "handle": {
+            "type": "string"
+          },
+          "bio": {
+            "type": "string"
+          },
+          "pfp": {
+            "type": "string"
+          },
+          "niche": {
+            "type": "string"
+          },
+          "linkInBio": {
+            "type": "string"
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Tag"
+            }
+          }
+        }
+      },
+      "AccountCreateResponse": {
+        "type": "object",
+        "required": [
+          "id",
+          "status",
+          "creditsCharged"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "draft"
+            ]
+          },
+          "creditsCharged": {
+            "type": "number",
+            "enum": [
+              0
+            ]
+          }
+        }
+      },
+      "AccountDeleteResponse": {
+        "type": "object",
+        "required": [
+          "id",
+          "status"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "deleted"
+            ]
+          }
+        }
+      },
+      "AccountListResponse": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Account"
+            }
+          }
+        }
+      },
+      "AccountStatus": {
+        "type": "string",
+        "enum": [
+          "draft",
+          "active",
+          "deleted"
+        ]
+      },
+      "AccountUpdateRequest": {
+        "type": "object",
+        "properties": {
+          "handle": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "bio": {
+            "type": "string"
+          },
+          "pfp": {
+            "type": "string"
+          },
+          "niche": {
+            "type": "string"
+          },
+          "linkInBio": {
+            "type": "string"
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Tag"
+            }
+          }
+        }
+      },
+      "AccountUpdateResponse": {
+        "type": "object",
+        "required": [
+          "accountId",
+          "updated"
+        ],
+        "properties": {
+          "accountId": {
+            "type": "string"
+          },
+          "updated": {
+            "type": "boolean",
+            "enum": [
+              true
+            ]
+          }
+        }
+      },
+      "ApiError": {
+        "type": "object",
+        "required": [
+          "error",
+          "message"
+        ],
+        "properties": {
+          "error": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "setup": {
+            "type": "string"
+          }
+        }
+      },
+      "ApiKeyRecoverRequest": {
+        "type": "object",
+        "required": [
+          "email"
+        ],
+        "properties": {
+          "email": {
+            "type": "string"
+          }
+        }
+      },
+      "ApiKeyRecoverResponse": {
+        "type": "object",
+        "required": [
+          "message"
+        ],
+        "properties": {
+          "message": {
+            "type": "string"
+          }
+        }
+      },
+      "ApiKeyRotateResponse": {
+        "type": "object",
+        "required": [
+          "apiKey",
+          "clientId",
+          "message"
+        ],
+        "properties": {
+          "apiKey": {
+            "type": "string"
+          },
+          "clientId": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      },
+      "ApiKeyStatusResponse": {
+        "type": "object",
+        "required": [
+          "status"
+        ],
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "completed"
+            ]
+          },
+          "apiKey": {
+            "type": "string"
+          },
+          "clientId": {
+            "type": "string"
+          },
+          "balance": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "isNew": {
+            "type": "boolean"
+          }
+        }
+      },
+      "Asset": {
+        "type": "object",
+        "required": [
+          "assetId",
+          "clientId",
+          "url",
+          "contentType",
+          "type",
+          "status",
+          "createdAt"
+        ],
+        "properties": {
+          "assetId": {
+            "type": "string"
+          },
+          "clientId": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          },
+          "r2Key": {
+            "type": "string"
+          },
+          "contentType": {
+            "type": "string"
+          },
+          "size": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "type": {
+            "$ref": "#/components/schemas/AssetType"
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Tag"
+            }
+          },
+          "metadata": {
+            "type": "object",
+            "additionalProperties": {}
+          },
+          "status": {
+            "$ref": "#/components/schemas/AssetStatus"
+          },
+          "createdAt": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "AssetCreateRequest": {
+        "type": "object",
+        "required": [
+          "url"
+        ],
+        "properties": {
+          "url": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "contentType": {
+            "type": "string"
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Tag"
+            }
+          },
+          "metadata": {
+            "type": "object",
+            "additionalProperties": {}
+          }
+        }
+      },
+      "AssetCreateResponse": {
+        "type": "object",
+        "required": [
+          "id",
+          "url",
+          "status"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "active"
+            ]
+          }
+        }
+      },
+      "AssetDeleteResponse": {
+        "type": "object",
+        "required": [
+          "id",
+          "status"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "deleted"
+            ]
+          }
+        }
+      },
+      "AssetListResponse": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Asset"
+            }
+          }
+        }
+      },
+      "AssetStatus": {
+        "type": "string",
+        "enum": [
+          "active",
+          "deleted"
+        ]
+      },
+      "AssetType": {
+        "type": "string",
+        "enum": [
+          "video",
+          "image",
+          "audio",
+          "other"
+        ]
+      },
+      "AssetUpdateRequest": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Tag"
+            }
+          },
+          "metadata": {
+            "type": "object",
+            "additionalProperties": {}
+          }
+        }
+      },
+      "AssetUpdateResponse": {
+        "type": "object",
+        "required": [
+          "assetId",
+          "updated"
+        ],
+        "properties": {
+          "assetId": {
+            "type": "string"
+          },
+          "updated": {
+            "type": "boolean",
+            "enum": [
+              true
+            ]
+          }
+        }
+      },
+      "BearerAuth": {
+        "type": "object",
+        "required": [
+          "type",
+          "scheme"
+        ],
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "http"
+            ],
+            "description": "Http authentication"
+          },
+          "scheme": {
+            "type": "string",
+            "enum": [
+              "bearer"
+            ],
+            "description": "bearer auth scheme"
+          }
+        },
+        "description": ""
+      },
+      "CheckRequest": {
+        "type": "object",
+        "required": [
+          "spec",
+          "rules"
+        ],
+        "properties": {
+          "spec": {
+            "type": "object",
+            "additionalProperties": {},
+            "description": "VidLang spec JSON to validate"
+          },
+          "rules": {
+            "type": "object",
+            "additionalProperties": {},
+            "description": "VidLang rules config. All rules off by default — enable explicitly. E.g. { \"VL013\": true, \"VL003\": false, \"VL011\": { \"severity\": \"warning\" } }"
+          }
+        }
+      },
+      "CheckResponse": {
+        "type": "object",
+        "required": [
+          "passed",
+          "results"
+        ],
+        "properties": {
+          "passed": {
+            "type": "boolean"
+          },
+          "results": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CheckResult"
+            }
+          }
+        }
+      },
+      "CheckResult": {
+        "type": "object",
+        "required": [
+          "rule",
+          "passed",
+          "message",
+          "severity"
+        ],
+        "properties": {
+          "rule": {
+            "type": "string"
+          },
+          "passed": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          },
+          "location": {
+            "type": "string"
+          },
+          "severity": {
+            "type": "string"
+          }
+        }
+      },
+      "CheckRulesResponse": {
+        "type": "object",
+        "required": [
+          "rules"
+        ],
+        "properties": {
+          "rules": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "CheckRulesUpdateRequest": {
+        "type": "object",
+        "required": [
+          "rules"
+        ],
+        "properties": {
+          "rules": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "ComplianceCheckResponse": {
+        "type": "object",
+        "required": [
+          "riskScore",
+          "verdict",
+          "violations",
+          "platform",
+          "policySnapshotDate",
+          "disclaimer"
+        ],
+        "properties": {
+          "riskScore": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Composite risk score 0-100 computed deterministically from violation severities."
+          },
+          "verdict": {
+            "type": "string",
+            "enum": [
+              "safe",
+              "caution",
+              "high-risk",
+              "likely-violation"
+            ]
+          },
+          "violations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ComplianceViolation"
+            }
+          },
+          "platform": {
+            "type": "string",
+            "enum": [
+              "youtube",
+              "tiktok",
+              "instagram",
+              "meta-ads",
+              "ftc"
+            ]
+          },
+          "policySnapshotDate": {
+            "type": "string",
+            "description": "ISO date of the newest active policy snapshot this scan was evaluated against."
+          },
+          "disclaimer": {
+            "type": "string",
+            "description": "Informational disclaimer. This response is not legal advice."
+          }
+        }
+      },
+      "ComplianceCitation": {
+        "type": "object",
+        "required": [
+          "text",
+          "sourceUrl",
+          "policyVersion"
+        ],
+        "properties": {
+          "text": {
+            "type": "string",
+            "description": "Exact quoted clause from the platform's policy page."
+          },
+          "sourceUrl": {
+            "type": "string",
+            "description": "URL to the source policy page (may include #anchor)."
+          },
+          "policyVersion": {
+            "type": "string",
+            "description": "ISO date (YYYY-MM-DD) of the policy snapshot this citation was drawn from."
+          }
+        }
+      },
+      "ComplianceContext": {
+        "type": "object",
+        "properties": {
+          "caption": {
+            "type": "string"
+          },
+          "hashtags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "monetized": {
+            "type": "boolean"
+          }
+        }
+      },
+      "ComplianceEvidence": {
+        "type": "object",
+        "properties": {
+          "timestamp": {
+            "type": "number",
+            "format": "double",
+            "description": "Timestamp (seconds) in the source video where the evidence appears."
+          },
+          "transcriptExcerpt": {
+            "type": "string",
+            "description": "Relevant transcript excerpt, if any."
+          },
+          "visualDescription": {
+            "type": "string",
+            "description": "Short description of the visual evidence, if any."
+          }
+        }
+      },
+      "CompliancePromptRequest": {
+        "type": "object",
+        "required": [
+          "text",
+          "platform"
+        ],
+        "properties": {
+          "text": {
+            "type": "string",
+            "description": "The text to evaluate — caption, ad copy, draft script, upload description, etc."
+          },
+          "platform": {
+            "type": "string",
+            "enum": [
+              "youtube",
+              "tiktok",
+              "instagram",
+              "meta-ads",
+              "ftc"
+            ]
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "caption",
+              "script",
+              "ad-copy",
+              "description",
+              "other"
+            ],
+            "description": "Optional label for logs; does not affect rule selection."
+          },
+          "context": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ComplianceContext"
+              }
+            ],
+            "description": "Optional publication metadata that affects risk (caption, hashtags, monetization intent)."
+          }
+        }
+      },
+      "ComplianceVideoRequest": {
+        "type": "object",
+        "required": [
+          "videoUrl",
+          "platform"
+        ],
+        "properties": {
+          "videoUrl": {
+            "type": "string",
+            "description": "Public URL of the video to scan."
+          },
+          "platform": {
+            "type": "string",
+            "enum": [
+              "youtube",
+              "tiktok",
+              "instagram",
+              "meta-ads",
+              "ftc"
+            ]
+          },
+          "format": {
+            "type": "string",
+            "enum": [
+              "shortform",
+              "longform"
+            ],
+            "description": "Optional content format hint. Inferred from duration when omitted."
+          },
+          "context": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ComplianceContext"
+              }
+            ],
+            "description": "Optional publication metadata that affects risk (caption, hashtags, monetization intent)."
+          }
+        }
+      },
+      "ComplianceViolation": {
+        "type": "object",
+        "required": [
+          "ruleId",
+          "category",
+          "severity",
+          "explanation",
+          "citation",
+          "evidence"
+        ],
+        "properties": {
+          "ruleId": {
+            "type": "string",
+            "description": "Stable identifier of the matched rule in our compliance corpus."
+          },
+          "category": {
+            "type": "string",
+            "description": "Rule category, e.g. monetization, community-guidelines, ad-policy, copyright, minors."
+          },
+          "severity": {
+            "type": "string",
+            "enum": [
+              "low",
+              "medium",
+              "high",
+              "critical"
+            ]
+          },
+          "explanation": {
+            "type": "string",
+            "description": "Plain-language reasoning tying the video to the cited rule. Informational, not legal advice."
+          },
+          "citation": {
+            "$ref": "#/components/schemas/ComplianceCitation"
+          },
+          "evidence": {
+            "$ref": "#/components/schemas/ComplianceEvidence"
+          }
+        }
+      },
+      "CreditCosts": {
+        "type": "object",
+        "required": [
+          "accounts.create",
+          "posts.create",
+          "watch",
+          "extract",
+          "transcribe",
+          "check"
+        ],
+        "properties": {
+          "accounts.create": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Create account (free)"
+          },
+          "posts.create": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Create post (free)"
+          },
+          "watch": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Watch media via Gemini"
+          },
+          "extract": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Extract frames/audio/metadata"
+          },
+          "transcribe": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Transcribe speech to text"
+          },
+          "check": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Check spec against rules"
+          }
+        }
+      },
+      "DisclaimerRequest": {
+        "type": "object",
+        "required": [
+          "videoUrl",
+          "text"
+        ],
+        "properties": {
+          "videoUrl": {
+            "type": "string",
+            "description": "URL of the source video"
+          },
+          "text": {
+            "type": "string",
+            "description": "Disclaimer text. Use \\\\n for line breaks. Kept fine-print style at the bottom of the frame."
+          },
+          "fontSize": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Font size in pixels. Defaults to 2.2% of video height (fine-print)."
+          }
+        }
+      },
+      "DisclaimerResponse": {
+        "type": "object",
+        "required": [
+          "id",
+          "resultUrl"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Disclaimer asset ID"
+          },
+          "resultUrl": {
+            "type": "string",
+            "description": "CDN URL of the disclaimed video"
+          }
+        }
+      },
+      "ExtractAudio": {
+        "type": "object",
+        "required": [
+          "url",
+          "duration"
+        ],
+        "properties": {
+          "url": {
+            "type": "string"
+          },
+          "duration": {
+            "type": "number",
+            "format": "double"
+          }
+        }
+      },
+      "ExtractFrame": {
+        "type": "object",
+        "required": [
+          "index",
+          "url"
+        ],
+        "properties": {
+          "index": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "url": {
+            "type": "string"
+          }
+        }
+      },
+      "ExtractMetadata": {
+        "type": "object",
+        "required": [
+          "width",
+          "height",
+          "fps",
+          "duration"
+        ],
+        "properties": {
+          "width": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "height": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "fps": {
+            "type": "number",
+            "format": "double"
+          },
+          "duration": {
+            "type": "number",
+            "format": "double"
+          }
+        }
+      },
+      "ExtractRequest": {
+        "type": "object",
+        "required": [
+          "mediaUrl"
+        ],
+        "properties": {
+          "mediaUrl": {
+            "type": "string",
+            "description": "URL of the video to extract from"
+          },
+          "frames": {
+            "description": "Frame indices to extract. Use [0, 75, 150] for specific frames, 'auto' for 3 evenly spaced, or 'last' for the final frame"
+          },
+          "audio": {
+            "type": "boolean",
+            "description": "Extract audio track as WAV"
+          },
+          "metadata": {
+            "type": "boolean",
+            "description": "Return video metadata (width, height, fps, duration). Defaults to true"
+          }
+        }
+      },
+      "ExtractResponse": {
+        "type": "object",
+        "properties": {
+          "frames": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ExtractFrame"
+            }
+          },
+          "audio": {
+            "$ref": "#/components/schemas/ExtractAudio"
+          },
+          "metadata": {
+            "$ref": "#/components/schemas/ExtractMetadata"
+          }
+        }
+      },
+      "InfoResponse": {
+        "type": "object",
+        "required": [
+          "name",
+          "version",
+          "endpoints",
+          "auth",
+          "credits"
+        ],
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "version": {
+            "type": "string"
+          },
+          "endpoints": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "auth": {},
+          "credits": {
+            "$ref": "#/components/schemas/CreditCosts"
+          }
+        }
+      },
+      "OverlayRequest": {
+        "type": "object",
+        "required": [
+          "videoUrl",
+          "text"
+        ],
+        "properties": {
+          "videoUrl": {
+            "type": "string",
+            "description": "URL of the source video"
+          },
+          "text": {
+            "type": "string",
+            "description": "Overlay text. Use \\\\n for line breaks."
+          },
+          "position": {
+            "type": "string",
+            "enum": [
+              "top",
+              "center",
+              "bottom"
+            ],
+            "description": "Vertical text placement"
+          },
+          "fontSize": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Font size in pixels. Defaults to 4% of video height."
+          },
+          "strokeThickness": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Text outline thickness (0-10). Defaults to 2."
+          }
+        }
+      },
+      "OverlayResponse": {
+        "type": "object",
+        "required": [
+          "id",
+          "resultUrl"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Overlay asset ID"
+          },
+          "resultUrl": {
+            "type": "string",
+            "description": "CDN URL of the overlaid video"
+          }
+        }
+      },
+      "Post": {
+        "type": "object",
+        "required": [
+          "postId",
+          "clientId",
+          "status",
+          "createdAt"
+        ],
+        "properties": {
+          "postId": {
+            "type": "string"
+          },
+          "clientId": {
+            "type": "string"
+          },
+          "accountId": {
+            "type": "string"
+          },
+          "videoId": {
+            "type": "string"
+          },
+          "mediaUrl": {
+            "type": "string"
+          },
+          "caption": {
+            "type": "string"
+          },
+          "brief": {},
+          "status": {
+            "$ref": "#/components/schemas/PostStatus"
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Tag"
+            }
+          },
+          "createdAt": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "PostCreateRequest": {
+        "type": "object",
+        "properties": {
+          "accountId": {
+            "type": "string"
+          },
+          "videoId": {
+            "type": "string"
+          },
+          "mediaUrl": {
+            "type": "string"
+          },
+          "caption": {
+            "type": "string"
+          },
+          "brief": {},
+          "tags": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Tag"
+            }
+          }
+        }
+      },
+      "PostCreateResponse": {
+        "type": "object",
+        "required": [
+          "id",
+          "status",
+          "creditsCharged"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "draft"
+            ]
+          },
+          "creditsCharged": {
+            "type": "number",
+            "enum": [
+              0
+            ]
+          }
+        }
+      },
+      "PostDeleteResponse": {
+        "type": "object",
+        "required": [
+          "id",
+          "status"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "deleted"
+            ]
+          }
+        }
+      },
+      "PostListResponse": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Post"
+            }
+          }
+        }
+      },
+      "PostStatus": {
+        "type": "string",
+        "enum": [
+          "draft",
+          "active",
+          "deleted"
+        ]
+      },
+      "PostUpdateRequest": {
+        "type": "object",
+        "properties": {
+          "caption": {
+            "type": "string"
+          },
+          "mediaUrl": {
+            "type": "string"
+          },
+          "videoId": {
+            "type": "string"
+          },
+          "accountId": {
+            "type": "string"
+          },
+          "brief": {},
+          "tags": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Tag"
+            }
+          }
+        }
+      },
+      "PostUpdateResponse": {
+        "type": "object",
+        "required": [
+          "postId",
+          "updated"
+        ],
+        "properties": {
+          "postId": {
+            "type": "string"
+          },
+          "updated": {
+            "type": "boolean",
+            "enum": [
+              true
+            ]
+          }
+        }
+      },
+      "PricingResponse": {
+        "type": "object",
+        "required": [
+          "subscription",
+          "pricePerCredit",
+          "maxAccounts",
+          "costs"
+        ],
+        "properties": {
+          "subscription": {
+            "$ref": "#/components/schemas/SubscriptionInfo"
+          },
+          "pricePerCredit": {
+            "type": "string"
+          },
+          "maxAccounts": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "costs": {
+            "$ref": "#/components/schemas/CreditCosts"
+          }
+        }
+      },
+      "Reference": {
+        "type": "object",
+        "required": [
+          "referenceId",
+          "clientId",
+          "url",
+          "status",
+          "createdAt"
+        ],
+        "properties": {
+          "referenceId": {
+            "type": "string"
+          },
+          "clientId": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          },
+          "platform": {
+            "type": "string"
+          },
+          "notes": {
+            "type": "string"
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Tag"
+            }
+          },
+          "metadata": {},
+          "status": {
+            "type": "string",
+            "enum": [
+              "active",
+              "deleted"
+            ]
+          },
+          "createdAt": {
+            "type": "number",
+            "format": "double"
+          }
+        }
+      },
+      "ReferenceCreateRequest": {
+        "type": "object",
+        "required": [
+          "url"
+        ],
+        "properties": {
+          "url": {
+            "type": "string"
+          },
+          "platform": {
+            "type": "string"
+          },
+          "notes": {
+            "type": "string"
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Tag"
+            }
+          },
+          "metadata": {}
+        }
+      },
+      "ReferenceCreateResponse": {
+        "type": "object",
+        "required": [
+          "id",
+          "status",
+          "creditsCharged"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "active"
+            ]
+          },
+          "creditsCharged": {
+            "type": "number",
+            "enum": [
+              0
+            ]
+          }
+        }
+      },
+      "ReferenceDeleteResponse": {
+        "type": "object",
+        "required": [
+          "id",
+          "status"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "deleted"
+            ]
+          }
+        }
+      },
+      "ReferenceListResponse": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Reference"
+            }
+          }
+        }
+      },
+      "ReferenceUpdateRequest": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string"
+          },
+          "platform": {
+            "type": "string"
+          },
+          "notes": {
+            "type": "string"
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Tag"
+            }
+          },
+          "metadata": {}
+        }
+      },
+      "ReferenceUpdateResponse": {
+        "type": "object",
+        "required": [
+          "referenceId",
+          "updated"
+        ],
+        "properties": {
+          "referenceId": {
+            "type": "string"
+          },
+          "updated": {
+            "type": "boolean",
+            "enum": [
+              true
+            ]
+          }
+        }
+      },
+      "SubscriptionCreateRequest": {
+        "type": "object",
+        "required": [
+          "email"
+        ],
+        "properties": {
+          "email": {
+            "type": "string"
+          }
+        }
+      },
+      "SubscriptionCreateResponse": {
+        "type": "object",
+        "required": [
+          "url",
+          "claimToken"
+        ],
+        "properties": {
+          "url": {
+            "type": "string"
+          },
+          "claimToken": {
+            "type": "string"
+          }
+        }
+      },
+      "SubscriptionInfo": {
+        "type": "object",
+        "required": [
+          "price",
+          "includedCredits",
+          "required"
+        ],
+        "properties": {
+          "price": {
+            "type": "string"
+          },
+          "includedCredits": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "required": {
+            "type": "boolean"
+          }
+        }
+      },
+      "Tag": {
+        "type": "object",
+        "required": [
+          "key",
+          "value"
+        ],
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "value": {
+            "type": "string"
+          }
+        }
+      },
+      "TranscribeRequest": {
+        "type": "object",
+        "required": [
+          "mediaUrl"
+        ],
+        "properties": {
+          "mediaUrl": {
+            "type": "string",
+            "description": "URL of the video or audio to transcribe"
+          },
+          "language": {
+            "type": "string",
+            "description": "Language code (e.g. 'en', 'es'). Auto-detected if omitted"
+          }
+        }
+      },
+      "TranscribeResponse": {
+        "type": "object",
+        "required": [
+          "transcript",
+          "words",
+          "language",
+          "duration"
+        ],
+        "properties": {
+          "transcript": {
+            "type": "string"
+          },
+          "words": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TranscribeWord"
+            }
+          },
+          "language": {
+            "type": "string"
+          },
+          "duration": {
+            "type": "number",
+            "format": "double"
+          }
+        }
+      },
+      "TranscribeWord": {
+        "type": "object",
+        "required": [
+          "word",
+          "start",
+          "end"
+        ],
+        "properties": {
+          "word": {
+            "type": "string"
+          },
+          "start": {
+            "type": "number",
+            "format": "double"
+          },
+          "end": {
+            "type": "number",
+            "format": "double"
+          }
+        }
+      },
+      "UploadResponse": {
+        "type": "object",
+        "required": [
+          "assetId",
+          "url",
+          "key",
+          "size"
+        ],
+        "properties": {
+          "assetId": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          },
+          "key": {
+            "type": "string"
+          },
+          "size": {
+            "type": "number",
+            "format": "double"
+          }
+        }
+      },
+      "UploadUrlRequest": {
+        "type": "object",
+        "required": [
+          "sourceUrl"
+        ],
+        "properties": {
+          "sourceUrl": {
+            "type": "string"
+          },
+          "contentType": {
+            "type": "string"
+          }
+        }
+      },
+      "UsageResponse": {
+        "type": "object",
+        "required": [
+          "clientId",
+          "usage",
+          "resetsAt"
+        ],
+        "properties": {
+          "clientId": {
+            "type": "string"
+          },
+          "usage": {
+            "type": "object",
+            "additionalProperties": {
+              "$ref": "#/components/schemas/UsageWindow"
+            }
+          },
+          "resetsAt": {
+            "type": "string"
+          }
+        }
+      },
+      "UsageWindow": {
+        "type": "object",
+        "required": [
+          "limit",
+          "remaining"
+        ],
+        "properties": {
+          "limit": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "remaining": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "VerifyConfirmBody": {
+        "type": "object",
+        "required": [
+          "email",
+          "code"
+        ],
+        "properties": {
+          "email": {
+            "type": "string"
+          },
+          "code": {
+            "type": "string"
+          }
+        }
+      },
+      "VerifyConfirmResponse": {
+        "type": "object",
+        "required": [
+          "status",
+          "apiKey",
+          "clientId"
+        ],
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "verified"
+            ]
+          },
+          "apiKey": {
+            "type": "string"
+          },
+          "clientId": {
+            "type": "string"
+          }
+        }
+      },
+      "VerifyRequestBody": {
+        "type": "object",
+        "required": [
+          "email"
+        ],
+        "properties": {
+          "email": {
+            "type": "string"
+          }
+        }
+      },
+      "VerifyRequestResponse": {
+        "type": "object",
+        "required": [
+          "sent"
+        ],
+        "properties": {
+          "sent": {
+            "type": "boolean"
+          }
+        }
+      },
+      "WatchRequest": {
+        "type": "object",
+        "required": [
+          "mediaUrl",
+          "prompt"
+        ],
+        "properties": {
+          "mediaUrl": {
+            "type": "string",
+            "description": "URL of the media to analyze"
+          },
+          "prompt": {
+            "type": "string",
+            "description": "Freeform prompt — tell AI what to look for"
+          }
+        }
+      },
+      "WatchResponse": {
+        "type": "object",
+        "required": [
+          "response"
+        ],
+        "properties": {
+          "response": {
+            "type": "object",
+            "additionalProperties": {},
+            "description": "Structured JSON response from AI based on the prompt"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "BearerAuth": {
+        "type": "http",
+        "scheme": "bearer"
+      }
+    }
+  },
+  "servers": [
+    {
+      "url": "https://api.vidjutsu.ai",
+      "description": "Production",
+      "variables": {}
+    }
+  ]
+}

@@ -4,5 +4,3 @@ dist/
 *.log
 .DS_Store
 
-# OpenAPI spec (fetched via sync:spec, not committed)
-spec/openapi.json
