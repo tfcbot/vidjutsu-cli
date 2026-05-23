@@ -9,6 +9,9 @@
       "name": "Assets"
     },
     {
+      "name": "Editor Projects"
+    },
+    {
       "name": "Credits"
     },
     {
@@ -947,6 +950,155 @@
         },
         "tags": [
           "Pricing"
+        ]
+      }
+    },
+    "/v1/projects": {
+      "post": {
+        "operationId": "createEditorProject",
+        "summary": "Create editor project",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "The request has succeeded and a new resource has been created as a result.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EditorProjectCreateResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Editor Projects"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EditorProjectCreateRequest"
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "operationId": "updateEditorProject",
+        "summary": "Update editor project",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "explode": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EditorProjectUpdateResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Editor Projects"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EditorProjectUpdateRequest"
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "operationId": "listOrGetEditorProjects",
+        "summary": "List projects or get by ID",
+        "description": "Returns a single project if ?id= is provided, or a list. Filter by ?status= or ?tag.key=value.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "explode": false
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "explode": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/EditorProject"
+                    },
+                    {
+                      "$ref": "#/components/schemas/EditorProjectListResponse"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Editor Projects"
+        ]
+      },
+      "delete": {
+        "operationId": "deleteEditorProject",
+        "summary": "Archive editor project (soft)",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "explode": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EditorProjectDeleteResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Editor Projects"
         ]
       }
     },
@@ -2199,6 +2351,180 @@
           "resultUrl": {
             "type": "string",
             "description": "CDN URL of the disclaimed video"
+          }
+        }
+      },
+      "EditorProject": {
+        "type": "object",
+        "required": [
+          "projectId",
+          "clientId",
+          "name",
+          "status",
+          "createdAt",
+          "updatedAt"
+        ],
+        "properties": {
+          "projectId": {
+            "type": "string"
+          },
+          "clientId": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "project": {
+            "type": "object",
+            "additionalProperties": {},
+            "description": "The serializable timeline document (Twick ProjectJSON: tracks, assets,\nmetadata, version). Stored opaquely; the editor owns its shape."
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Tag"
+            }
+          },
+          "metadata": {
+            "type": "object",
+            "additionalProperties": {}
+          },
+          "status": {
+            "$ref": "#/components/schemas/EditorProjectStatus"
+          },
+          "createdAt": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "updatedAt": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "EditorProjectCreateRequest": {
+        "type": "object",
+        "required": [
+          "name"
+        ],
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "project": {
+            "type": "object",
+            "additionalProperties": {}
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Tag"
+            }
+          },
+          "metadata": {
+            "type": "object",
+            "additionalProperties": {}
+          }
+        }
+      },
+      "EditorProjectCreateResponse": {
+        "type": "object",
+        "required": [
+          "id",
+          "status"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "draft"
+            ]
+          }
+        }
+      },
+      "EditorProjectDeleteResponse": {
+        "type": "object",
+        "required": [
+          "id",
+          "status"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "archived"
+            ]
+          }
+        }
+      },
+      "EditorProjectListResponse": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EditorProject"
+            }
+          }
+        }
+      },
+      "EditorProjectStatus": {
+        "type": "string",
+        "enum": [
+          "draft",
+          "active",
+          "archived"
+        ]
+      },
+      "EditorProjectUpdateRequest": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/EditorProjectStatus"
+          },
+          "project": {
+            "type": "object",
+            "additionalProperties": {}
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Tag"
+            }
+          },
+          "metadata": {
+            "type": "object",
+            "additionalProperties": {}
+          }
+        }
+      },
+      "EditorProjectUpdateResponse": {
+        "type": "object",
+        "required": [
+          "projectId",
+          "updated"
+        ],
+        "properties": {
+          "projectId": {
+            "type": "string"
+          },
+          "updated": {
+            "type": "boolean",
+            "enum": [
+              true
+            ]
           }
         }
       },
