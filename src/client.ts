@@ -79,7 +79,8 @@ export async function publicRequest(
 export async function apiRequest(
   method: string,
   path: string,
-  body?: unknown
+  body?: unknown,
+  options?: { idempotencyKey?: string },
 ): Promise<unknown> {
   const config = loadConfig();
   if (!config.apiKey) {
@@ -92,6 +93,9 @@ export async function apiRequest(
   const headers: Record<string, string> = {
     "Authorization": `Bearer ${config.apiKey}`,
     "Content-Type": "application/json",
+    ...(options?.idempotencyKey
+      ? { "Idempotency-Key": options.idempotencyKey }
+      : {}),
   };
 
   const res = await fetch(url, {
