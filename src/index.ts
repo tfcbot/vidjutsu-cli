@@ -17,6 +17,10 @@ const main = defineCommand({
     status: () => import("./commands/status").then((m) => m.default),
     version: () => import("./commands/version").then((m) => m.default),
     update: () => import("./commands/update").then((m) => m.default),
+    clone: () => import("./commands/clone").then((m) => m.default),
+    character: () => import("./commands/character").then((m) => m.default),
+    task: () => import("./commands/task").then((m) => m.default),
+    jobs: () => import("./commands/jobs").then((m) => m.default),
 
     // --- Generated from OpenAPI spec ---
     watch: () => import("./commands/generated/watch").then((m) => m.default),
