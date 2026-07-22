@@ -13,6 +13,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: '1.3.10'
+
       - uses: anthropics/claude-code-action@v1
         with:
           model: claude-sonnet-4-6
@@ -21,18 +25,19 @@ jobs:
             Commit message: ${{ github.event.client_payload.message }}
 
             Your job:
-            1. Fetch the latest API info endpoint to see what endpoints exist:
-               curl -s https://effervescent-ermine-544.convex.site/v1/info | jq .
-            2. Compare the endpoints listed in the API response against the CLI commands in src/commands/
+            1. Fetch the canonical public contract:
+               curl -sL https://raw.githubusercontent.com/tfcbot/vidjutsu-openapi/main/openapi/spec.json -o spec/openapi.json
+            2. Compare the OpenAPI operations against the registered CLI commands in src/index.ts and src/commands/
             3. Check if there are new endpoints the CLI doesn't support yet, or if any existing endpoints changed
             4. If changes are needed:
                - Update or create CLI commands to match the API
-               - Follow the exact patterns in the existing commands (read src/commands/balance.ts and src/commands/generate.ts as references)
+               - Follow the current patterns in src/commands/generated/watch.ts and src/commands/clone.ts
                - Use the client from src/client.ts
-            5. If no CLI changes are needed (e.g., the API change was backend-only), say so and exit
+            5. Run bun run check after any change
+            6. If no CLI changes are needed (e.g., the API change was backend-only), say so and exit
 
             Do NOT change the release workflow, install script, or package.json version.
-            Only modify files in src/ if the API surface changed.
+            Only modify spec/openapi.json plus the source and focused tests required by the API change.
           allowed_tools: "Read,Write,Edit,Bash,Glob,Grep"
           direct_prompt: true
           create_pr: true

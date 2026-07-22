@@ -2,14 +2,24 @@
   "openapi": "3.0.0",
   "info": {
     "title": "VidJutsu API",
-    "version": "2026-04-02"
+    "version": "2026-07-22",
+    "description": "VidJutsu is a video API built for agents to operate directly. Your agent can clone viral trending skits now: stage a trending clip with /v1/videos/download/tiktok or /v1/videos/download/instagram, check it for cloneability, generate a character and a clean starting frame, then render the clone. Kling 3.0 Motion Control is the supported clone-video model and preserves the source soundtrack."
   },
   "tags": [
     {
       "name": "Assets"
     },
     {
-      "name": "Credits"
+      "name": "Editor Projects"
+    },
+    {
+      "name": "Scrape"
+    },
+    {
+      "name": "Videos"
+    },
+    {
+      "name": "Billing"
     },
     {
       "name": "API Keys"
@@ -61,6 +71,16 @@
     },
     {
       "name": "Disclaimer"
+    },
+    {
+      "name": "Agent"
+    },
+    {
+      "name": "Characters"
+    },
+    {
+      "name": "Cloning",
+      "description": "Your agent can Clone Viral Trending Skits Now. These endpoints check whether a staged source video is worth cloning, generate the character and starting frame, and render and poll the final clone video."
     }
   ],
   "paths": {
@@ -407,6 +427,150 @@
         ]
       }
     },
+    "/v1/auth/agent": {
+      "post": {
+        "operationId": "signupAgent",
+        "summary": "Agent registration (auth.md)",
+        "description": "Register a machine client per the auth.md protocol. Two identity types are supported: `anonymous` (returns an API key immediately with pre-claim scopes) and `verified_email` (kicks off OTP, returns only a claim_token). Both flows are user-claimed — the agent and user run the entire ceremony with no agent-provider participation required.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AgentSignupResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Agent"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AgentSignupBody"
+              }
+            }
+          }
+        },
+        "security": [
+          {}
+        ]
+      }
+    },
+    "/v1/auth/agent/claim": {
+      "post": {
+        "operationId": "agentClaim",
+        "summary": "Initiate claim flow",
+        "description": "Initiate the email-verification claim flow for a previously-issued anonymous registration. Sends a 6-digit OTP to the supplied email and returns a claim_attempt_id.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AgentClaimResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Agent"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AgentClaimRequest"
+              }
+            }
+          }
+        },
+        "security": [
+          {}
+        ]
+      }
+    },
+    "/v1/auth/agent/claim/complete": {
+      "post": {
+        "operationId": "agentClaimComplete",
+        "summary": "Complete claim flow",
+        "description": "Complete the email-verification claim flow by submitting the OTP. On success the registration's claimStatus flips to email_verified, post-claim scopes are unlocked, and a freshly-rotated API key is returned. The original pre-claim `vj_anon_*` key is invalidated server-side as a hygiene measure — agents MUST swap it for the new credential.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AgentClaimCompleteResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Agent"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AgentClaimCompleteRequest"
+              }
+            }
+          }
+        },
+        "security": [
+          {}
+        ]
+      }
+    },
+    "/v1/auth/agent/revoke": {
+      "post": {
+        "operationId": "agentRevoke",
+        "summary": "Revoke credential",
+        "description": "Revoke a previously-issued credential. Accepts a logout JWT body (application/logout+jwt) for future provider-driven revocation; currently a no-op receiver, returns 200.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AgentRevokeResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Agent"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/logout+jwt": {
+              "schema": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "security": [
+          {}
+        ]
+      }
+    },
     "/v1/auth/verify/confirm": {
       "post": {
         "operationId": "confirmVerification",
@@ -473,11 +637,146 @@
         }
       }
     },
+    "/v1/characters": {
+      "post": {
+        "operationId": "createCharacter",
+        "summary": "Create a reusable, persisted character image",
+        "description": "Generates a photoreal character identity image from a text prompt, optionally guided by one HTTPS reference image, and persists it durably under an id. Returns the character id plus a CDN-hosted image URL; reuse the id later via cloneStartingImage's characterId or fetch it again with GET /v1/characters/{id}. Synchronous; typically completes within a minute. Shares the daily clone admission limit.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateCharacterResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "HTTP 403 Forbidden — a valid API key with no active subscription called a gated endpoint. Body is the standard ApiError with error=\"subscription_required\".",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "HTTP 429 Too Many Requests — a per-endpoint daily rate limit was exceeded. The limit window is fixed and resets at 00:00 UTC. Body is the standard ApiError; a Retry-After header carries the seconds until reset.",
+            "headers": {
+              "Retry-After": {
+                "required": false,
+                "schema": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Characters"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateCharacterRequest"
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "operationId": "listCharacters",
+        "summary": "List your persisted characters",
+        "description": "Returns all characters previously created by the caller, most recent first. Status/list reads are not billed.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListCharactersResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "HTTP 403 Forbidden — a valid API key with no active subscription called a gated endpoint. Body is the standard ApiError with error=\"subscription_required\".",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Characters"
+        ]
+      }
+    },
+    "/v1/characters/{id}": {
+      "get": {
+        "operationId": "getCharacter",
+        "summary": "Fetch a persisted character by id",
+        "description": "Returns a single character owned by the caller. Unknown ids and other tenants' ids return 404. Status reads are not billed.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Character"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "HTTP 403 Forbidden — a valid API key with no active subscription called a gated endpoint. Body is the standard ApiError with error=\"subscription_required\".",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Characters"
+        ]
+      }
+    },
     "/v1/check": {
       "post": {
         "operationId": "checkSpec",
         "summary": "Check spec",
-        "description": "Validate a VidLang spec against enabled rules. Rules are off by default — caller must enable at least one. 5 credits.",
+        "description": "Validate a VidLang spec against enabled rules. Rules are off by default — caller must enable at least one. Daily limit: 100/day (resets 00:00 UTC).",
         "parameters": [],
         "responses": {
           "200": {
@@ -486,6 +785,35 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/CheckResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "HTTP 403 Forbidden — a valid API key with no active subscription called a gated endpoint. Body is the standard ApiError with error=\"subscription_required\".",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "HTTP 429 Too Many Requests — a per-endpoint daily rate limit was exceeded. The limit window is fixed and resets at 00:00 UTC. Body is the standard ApiError; a Retry-After header carries the seconds until reset.",
+            "headers": {
+              "Retry-After": {
+                "required": false,
+                "schema": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
                 }
               }
             }
@@ -510,7 +838,7 @@
       "get": {
         "operationId": "getCheckRules",
         "summary": "Get check rules",
-        "description": "Load per-client custom rules. 0 credits.",
+        "description": "Load per-client custom rules. Unmetered — no daily limit.",
         "parameters": [],
         "responses": {
           "200": {
@@ -531,7 +859,7 @@
       "put": {
         "operationId": "updateCheckRules",
         "summary": "Update check rules",
-        "description": "Save per-client custom rules. 0 credits.",
+        "description": "Save per-client custom rules. Unmetered — no daily limit.",
         "parameters": [],
         "responses": {
           "200": {
@@ -560,6 +888,234 @@
         }
       }
     },
+    "/v1/clones/check": {
+      "post": {
+        "operationId": "cloneCheck",
+        "summary": "Evaluate whether a source video can be cloned reliably",
+        "description": "Runs a synchronous, deterministic cloneability analysis of a staged source video and returns a verdict (strong, possible, or weak), a 0-100 score, and the evidence behind them, so the agent can branch on the result, for example stopping on a weak verdict. The videoUrl must be public HTTPS and staged first: provider CDNs cannot fetch TikTok or Instagram links directly, so download the source with /v1/videos/download/tiktok or /v1/videos/download/instagram before checking it. The source video must be at most ~2 minutes long. Shares the daily clone admission limit.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CloneCheckResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "HTTP 403 Forbidden — a valid API key with no active subscription called a gated endpoint. Body is the standard ApiError with error=\"subscription_required\".",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "HTTP 429 Too Many Requests — a per-endpoint daily rate limit was exceeded. The limit window is fixed and resets at 00:00 UTC. Body is the standard ApiError; a Retry-After header carries the seconds until reset.",
+            "headers": {
+              "Retry-After": {
+                "required": false,
+                "schema": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Cloning"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CloneCheckRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/clones/starting-image": {
+      "post": {
+        "operationId": "cloneStartingImage",
+        "summary": "Create a character-swapped starting frame",
+        "description": "Edits the supplied firstFrame image with google/gemini-3.1-flash-image through the caller's tenant-scoped Vercel AI Gateway key. The first frame supplies pose, framing, lighting, background, and composition; the required characterId supplies the replacement identity. The returned image is generated with a server-enforced instruction to remove text overlays, captions, subtitles, watermarks, and platform UI. firstFrame must be public HTTPS. Synchronous; typically completes within a minute. Shares the daily clone admission limit.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GeneratedImageResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "HTTP 403 Forbidden — a valid API key with no active subscription called a gated endpoint. Body is the standard ApiError with error=\"subscription_required\".",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "HTTP 429 Too Many Requests — a per-endpoint daily rate limit was exceeded. The limit window is fixed and resets at 00:00 UTC. Body is the standard ApiError; a Retry-After header carries the seconds until reset.",
+            "headers": {
+              "Retry-After": {
+                "required": false,
+                "schema": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Cloning"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CloneStartingImageRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/clones/video": {
+      "post": {
+        "operationId": "cloneVideo",
+        "summary": "Clone source motion with Kling 3.0 Motion Control",
+        "description": "Submits an asynchronous Kling 3.0 Motion Control generation. The starting-image identity is puppeted with the source video's motion while keeping the original sound. All URLs must be public HTTPS. Source clips are capped at 15 seconds; a longer sourceVideoUrl is rejected with a 422 and an error of \"video_too_long\". Returns 202 with a task id to read via GET /v1/clones/video/{id}.",
+        "parameters": [],
+        "responses": {
+          "202": {
+            "description": "The request has been accepted for processing, but processing has not yet completed.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CloneVideoAccepted"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "HTTP 403 Forbidden — a valid API key with no active subscription called a gated endpoint. Body is the standard ApiError with error=\"subscription_required\".",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "HTTP 429 Too Many Requests — a per-endpoint daily rate limit was exceeded. The limit window is fixed and resets at 00:00 UTC. Body is the standard ApiError; a Retry-After header carries the seconds until reset.",
+            "headers": {
+              "Retry-After": {
+                "required": false,
+                "schema": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Cloning"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CloneVideoRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/clones/video/{id}": {
+      "get": {
+        "operationId": "getCloneVideo",
+        "summary": "Poll a clone video task",
+        "description": "Returns the current status of a clone video task owned by the caller. While status is \"processing\", poll again later; on \"completed\" the videoUrl field carries the HTTPS result URL, and on \"failed\" the error field explains why. Unknown ids and other tenants' ids return 404. Status reads are not billed.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CloneVideoStatusResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "HTTP 403 Forbidden — a valid API key with no active subscription called a gated endpoint. Body is the standard ApiError with error=\"subscription_required\".",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Cloning"
+        ]
+      }
+    },
     "/v1/compliance/prompt": {
       "post": {
         "operationId": "checkCompliancePrompt",
@@ -573,6 +1129,35 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ComplianceCheckResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "HTTP 403 Forbidden — a valid API key with no active subscription called a gated endpoint. Body is the standard ApiError with error=\"subscription_required\".",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "HTTP 429 Too Many Requests — a per-endpoint daily rate limit was exceeded. The limit window is fixed and resets at 00:00 UTC. Body is the standard ApiError; a Retry-After header carries the seconds until reset.",
+            "headers": {
+              "Retry-After": {
+                "required": false,
+                "schema": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
                 }
               }
             }
@@ -609,6 +1194,35 @@
                 }
               }
             }
+          },
+          "403": {
+            "description": "HTTP 403 Forbidden — a valid API key with no active subscription called a gated endpoint. Body is the standard ApiError with error=\"subscription_required\".",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "HTTP 429 Too Many Requests — a per-endpoint daily rate limit was exceeded. The limit window is fixed and resets at 00:00 UTC. Body is the standard ApiError; a Retry-After header carries the seconds until reset.",
+            "headers": {
+              "Retry-After": {
+                "required": false,
+                "schema": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
           }
         },
         "tags": [
@@ -630,6 +1244,7 @@
       "get": {
         "operationId": "getCheckoutStatus",
         "summary": "Check checkout status",
+        "description": "Poll after starting a /v1/subscribe checkout. Once payment completes, returns the minted API key and clientId. (The /v1/credits route prefix is historical; this endpoint retrieves the subscription key, not a credit balance.)",
         "parameters": [
           {
             "name": "session",
@@ -654,7 +1269,7 @@
           }
         },
         "tags": [
-          "Credits"
+          "Billing"
         ]
       }
     },
@@ -662,7 +1277,7 @@
       "post": {
         "operationId": "createDisclaimer",
         "summary": "Burn fine-print disclaimer onto video",
-        "description": "Burns a fine-print disclaimer centered at the bottom of a video using FFmpeg ASS subtitles. Use for FTC-style disclosures like results-not-typical, paid-endorsement, or AI-generated labels. Returns CDN URL of the result. 5 credits.",
+        "description": "Burns a fine-print disclaimer centered at the bottom of a video using FFmpeg ASS subtitles. Use for FTC-style disclosures like results-not-typical, paid-endorsement, or AI-generated labels. Returns CDN URL of the result. Daily limit: 50/day (resets 00:00 UTC).",
         "parameters": [],
         "responses": {
           "200": {
@@ -671,6 +1286,35 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/DisclaimerResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "HTTP 403 Forbidden — a valid API key with no active subscription called a gated endpoint. Body is the standard ApiError with error=\"subscription_required\".",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "HTTP 429 Too Many Requests — a per-endpoint daily rate limit was exceeded. The limit window is fixed and resets at 00:00 UTC. Body is the standard ApiError; a Retry-After header carries the seconds until reset.",
+            "headers": {
+              "Retry-After": {
+                "required": false,
+                "schema": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
                 }
               }
             }
@@ -695,7 +1339,7 @@
       "post": {
         "operationId": "extractMedia",
         "summary": "Extract from media",
-        "description": "Pull frames, audio, and metadata from a video via server-side processing. 5 credits.",
+        "description": "Pull frames, audio, and metadata from a video via server-side processing. Daily limit: 100/day (resets 00:00 UTC).",
         "parameters": [],
         "responses": {
           "200": {
@@ -704,6 +1348,35 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ExtractResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "HTTP 403 Forbidden — a valid API key with no active subscription called a gated endpoint. Body is the standard ApiError with error=\"subscription_required\".",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "HTTP 429 Too Many Requests — a per-endpoint daily rate limit was exceeded. The limit window is fixed and resets at 00:00 UTC. Body is the standard ApiError; a Retry-After header carries the seconds until reset.",
+            "headers": {
+              "Retry-After": {
+                "required": false,
+                "schema": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
                 }
               }
             }
@@ -750,7 +1423,7 @@
       "post": {
         "operationId": "createOverlay",
         "summary": "Burn text overlay onto video",
-        "description": "Burns text overlay onto a video using FFmpeg ASS subtitles. Supports TikTok-safe zones, configurable font size, stroke thickness, and top/center/bottom positioning. Returns CDN URL of the result. 5 credits.",
+        "description": "Burns text overlay onto a video using FFmpeg ASS subtitles. Supports TikTok-safe zones, configurable font size, stroke thickness, and top/center/bottom positioning. Returns CDN URL of the result. Daily limit: 50/day (resets 00:00 UTC).",
         "parameters": [],
         "responses": {
           "200": {
@@ -759,6 +1432,35 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/OverlayResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "HTTP 403 Forbidden — a valid API key with no active subscription called a gated endpoint. Body is the standard ApiError with error=\"subscription_required\".",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "HTTP 429 Too Many Requests — a per-endpoint daily rate limit was exceeded. The limit window is fixed and resets at 00:00 UTC. Body is the standard ApiError; a Retry-After header carries the seconds until reset.",
+            "headers": {
+              "Retry-After": {
+                "required": false,
+                "schema": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
                 }
               }
             }
@@ -950,6 +1652,155 @@
         ]
       }
     },
+    "/v1/projects": {
+      "post": {
+        "operationId": "createEditorProject",
+        "summary": "Create editor project",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "The request has succeeded and a new resource has been created as a result.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EditorProjectCreateResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Editor Projects"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EditorProjectCreateRequest"
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "operationId": "updateEditorProject",
+        "summary": "Update editor project",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "explode": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EditorProjectUpdateResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Editor Projects"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EditorProjectUpdateRequest"
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "operationId": "listOrGetEditorProjects",
+        "summary": "List projects or get by ID",
+        "description": "Returns a single project if ?id= is provided, or a list. Filter by ?status= or ?tag.key=value.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "explode": false
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "explode": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/EditorProject"
+                    },
+                    {
+                      "$ref": "#/components/schemas/EditorProjectListResponse"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Editor Projects"
+        ]
+      },
+      "delete": {
+        "operationId": "deleteEditorProject",
+        "summary": "Archive editor project (soft)",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "explode": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EditorProjectDeleteResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Editor Projects"
+        ]
+      }
+    },
     "/v1/references": {
       "post": {
         "operationId": "createReference",
@@ -1099,10 +1950,755 @@
         ]
       }
     },
+    "/v1/scrape/instagram/post": {
+      "post": {
+        "operationId": "scrapeInstagramPost",
+        "summary": "Scrape Instagram post or reel",
+        "description": "Single Instagram post or reel + media URLs. Counts as 1 request against the shared scrape group (500/day).",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScrapeResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "HTTP 403 Forbidden — a valid API key with no active subscription called a gated endpoint. Body is the standard ApiError with error=\"subscription_required\".",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "HTTP 429 Too Many Requests — a per-endpoint daily rate limit was exceeded. The limit window is fixed and resets at 00:00 UTC. Body is the standard ApiError; a Retry-After header carries the seconds until reset.",
+            "headers": {
+              "Retry-After": {
+                "required": false,
+                "schema": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Scrape"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ScrapeInstagramPostRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/scrape/instagram/post/comments": {
+      "post": {
+        "operationId": "scrapeInstagramPostComments",
+        "summary": "Scrape Instagram post comments",
+        "description": "Comments on an Instagram post or reel. 1 op.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScrapeResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "HTTP 403 Forbidden — a valid API key with no active subscription called a gated endpoint. Body is the standard ApiError with error=\"subscription_required\".",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "HTTP 429 Too Many Requests — a per-endpoint daily rate limit was exceeded. The limit window is fixed and resets at 00:00 UTC. Body is the standard ApiError; a Retry-After header carries the seconds until reset.",
+            "headers": {
+              "Retry-After": {
+                "required": false,
+                "schema": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Scrape"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ScrapeInstagramPostCommentsRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/scrape/instagram/profile": {
+      "post": {
+        "operationId": "scrapeInstagramProfile",
+        "summary": "Scrape Instagram profile",
+        "description": "Public Instagram profile + recent reels. Counts as 1 request against the shared scrape group (500/day).",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScrapeResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "HTTP 403 Forbidden — a valid API key with no active subscription called a gated endpoint. Body is the standard ApiError with error=\"subscription_required\".",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "HTTP 429 Too Many Requests — a per-endpoint daily rate limit was exceeded. The limit window is fixed and resets at 00:00 UTC. Body is the standard ApiError; a Retry-After header carries the seconds until reset.",
+            "headers": {
+              "Retry-After": {
+                "required": false,
+                "schema": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Scrape"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ScrapeInstagramProfileRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/scrape/instagram/user/posts": {
+      "post": {
+        "operationId": "scrapeInstagramUserPosts",
+        "summary": "Scrape Instagram user posts",
+        "description": "Paginated posts for an Instagram profile. Counts as 1 request against the shared scrape group (500/day).",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScrapeResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "HTTP 403 Forbidden — a valid API key with no active subscription called a gated endpoint. Body is the standard ApiError with error=\"subscription_required\".",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "HTTP 429 Too Many Requests — a per-endpoint daily rate limit was exceeded. The limit window is fixed and resets at 00:00 UTC. Body is the standard ApiError; a Retry-After header carries the seconds until reset.",
+            "headers": {
+              "Retry-After": {
+                "required": false,
+                "schema": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Scrape"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ScrapeInstagramUserPostsRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/scrape/instagram/user/reels": {
+      "post": {
+        "operationId": "scrapeInstagramUserReels",
+        "summary": "Scrape Instagram user reels",
+        "description": "Paginated reels for an Instagram profile. Counts as 1 request against the shared scrape group (500/day).",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScrapeResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "HTTP 403 Forbidden — a valid API key with no active subscription called a gated endpoint. Body is the standard ApiError with error=\"subscription_required\".",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "HTTP 429 Too Many Requests — a per-endpoint daily rate limit was exceeded. The limit window is fixed and resets at 00:00 UTC. Body is the standard ApiError; a Retry-After header carries the seconds until reset.",
+            "headers": {
+              "Retry-After": {
+                "required": false,
+                "schema": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Scrape"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ScrapeInstagramUserReelsRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/scrape/tiktok/profile": {
+      "post": {
+        "operationId": "scrapeTikTokProfile",
+        "summary": "Scrape TikTok profile",
+        "description": "Fetch public TikTok profile data via Scrape Creators. Counts as 1 request against the shared scrape group (500/day).",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScrapeResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "HTTP 403 Forbidden — a valid API key with no active subscription called a gated endpoint. Body is the standard ApiError with error=\"subscription_required\".",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "HTTP 429 Too Many Requests — a per-endpoint daily rate limit was exceeded. The limit window is fixed and resets at 00:00 UTC. Body is the standard ApiError; a Retry-After header carries the seconds until reset.",
+            "headers": {
+              "Retry-After": {
+                "required": false,
+                "schema": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Scrape"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ScrapeTikTokProfileRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/scrape/tiktok/profile/videos": {
+      "post": {
+        "operationId": "scrapeTikTokProfileVideos",
+        "summary": "Scrape TikTok profile videos",
+        "description": "Paginated videos for a TikTok profile. Counts as 1 request against the shared scrape group (500/day).",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScrapeResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "HTTP 403 Forbidden — a valid API key with no active subscription called a gated endpoint. Body is the standard ApiError with error=\"subscription_required\".",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "HTTP 429 Too Many Requests — a per-endpoint daily rate limit was exceeded. The limit window is fixed and resets at 00:00 UTC. Body is the standard ApiError; a Retry-After header carries the seconds until reset.",
+            "headers": {
+              "Retry-After": {
+                "required": false,
+                "schema": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Scrape"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ScrapeTikTokProfileVideosRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/scrape/tiktok/search/users": {
+      "post": {
+        "operationId": "scrapeTikTokSearchUsers",
+        "summary": "Scrape TikTok user search",
+        "description": "Search TikTok users by keyword. 1 op.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScrapeResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "HTTP 403 Forbidden — a valid API key with no active subscription called a gated endpoint. Body is the standard ApiError with error=\"subscription_required\".",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "HTTP 429 Too Many Requests — a per-endpoint daily rate limit was exceeded. The limit window is fixed and resets at 00:00 UTC. Body is the standard ApiError; a Retry-After header carries the seconds until reset.",
+            "headers": {
+              "Retry-After": {
+                "required": false,
+                "schema": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Scrape"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ScrapeTikTokSearchUsersRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/scrape/tiktok/trending": {
+      "post": {
+        "operationId": "scrapeTikTokTrending",
+        "summary": "Scrape TikTok trending feed",
+        "description": "Trending feed by region. Counts as 1 request against the shared scrape group (500/day).",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScrapeResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "HTTP 403 Forbidden — a valid API key with no active subscription called a gated endpoint. Body is the standard ApiError with error=\"subscription_required\".",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "HTTP 429 Too Many Requests — a per-endpoint daily rate limit was exceeded. The limit window is fixed and resets at 00:00 UTC. Body is the standard ApiError; a Retry-After header carries the seconds until reset.",
+            "headers": {
+              "Retry-After": {
+                "required": false,
+                "schema": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Scrape"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ScrapeTikTokTrendingRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/scrape/tiktok/video": {
+      "post": {
+        "operationId": "scrapeTikTokVideo",
+        "summary": "Scrape TikTok video",
+        "description": "Single TikTok video metadata + media URLs. Counts as 1 request against the shared scrape group (500/day).",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScrapeResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "HTTP 403 Forbidden — a valid API key with no active subscription called a gated endpoint. Body is the standard ApiError with error=\"subscription_required\".",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "HTTP 429 Too Many Requests — a per-endpoint daily rate limit was exceeded. The limit window is fixed and resets at 00:00 UTC. Body is the standard ApiError; a Retry-After header carries the seconds until reset.",
+            "headers": {
+              "Retry-After": {
+                "required": false,
+                "schema": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Scrape"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ScrapeTikTokVideoRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/scrape/tiktok/video/comments": {
+      "post": {
+        "operationId": "scrapeTikTokVideoComments",
+        "summary": "Scrape TikTok video comments",
+        "description": "Comments on a TikTok video. 1 op.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScrapeResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "HTTP 403 Forbidden — a valid API key with no active subscription called a gated endpoint. Body is the standard ApiError with error=\"subscription_required\".",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "HTTP 429 Too Many Requests — a per-endpoint daily rate limit was exceeded. The limit window is fixed and resets at 00:00 UTC. Body is the standard ApiError; a Retry-After header carries the seconds until reset.",
+            "headers": {
+              "Retry-After": {
+                "required": false,
+                "schema": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Scrape"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ScrapeTikTokVideoCommentsRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/scrape/tiktok/video/transcript": {
+      "post": {
+        "operationId": "scrapeTikTokVideoTranscript",
+        "summary": "Scrape TikTok video transcript",
+        "description": "Spoken transcript for a TikTok video. 1 op.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScrapeResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "HTTP 403 Forbidden — a valid API key with no active subscription called a gated endpoint. Body is the standard ApiError with error=\"subscription_required\".",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "HTTP 429 Too Many Requests — a per-endpoint daily rate limit was exceeded. The limit window is fixed and resets at 00:00 UTC. Body is the standard ApiError; a Retry-After header carries the seconds until reset.",
+            "headers": {
+              "Retry-After": {
+                "required": false,
+                "schema": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Scrape"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ScrapeTikTokVideoTranscriptRequest"
+              }
+            }
+          }
+        }
+      }
+    },
     "/v1/subscribe": {
       "post": {
         "operationId": "createSubscription",
         "summary": "Create subscription",
+        "description": "Starts a Stripe Checkout session for the flat $99/mo subscription. Returns the hosted checkout `url` and a `claimToken`. After payment, poll GET /v1/credits/status with the session id to retrieve the minted API key. An active subscription is required for all gated intelligence endpoints; calls without one return 403 subscription_required.",
         "parameters": [],
         "responses": {
           "200": {
@@ -1135,7 +2731,7 @@
       "post": {
         "operationId": "transcribeMedia",
         "summary": "Transcribe media",
-        "description": "Speech-to-text with word-level timing. 10 credits.",
+        "description": "Speech-to-text with word-level timing. Daily limit: 30/day (resets 00:00 UTC).",
         "parameters": [],
         "responses": {
           "200": {
@@ -1144,6 +2740,35 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/TranscribeResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "HTTP 403 Forbidden — a valid API key with no active subscription called a gated endpoint. Body is the standard ApiError with error=\"subscription_required\".",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "HTTP 429 Too Many Requests — a per-endpoint daily rate limit was exceeded. The limit window is fixed and resets at 00:00 UTC. Body is the standard ApiError; a Retry-After header carries the seconds until reset.",
+            "headers": {
+              "Retry-After": {
+                "required": false,
+                "schema": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
                 }
               }
             }
@@ -1179,6 +2804,35 @@
                 }
               }
             }
+          },
+          "403": {
+            "description": "HTTP 403 Forbidden — a valid API key with no active subscription called a gated endpoint. Body is the standard ApiError with error=\"subscription_required\".",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "HTTP 429 Too Many Requests — a per-endpoint daily rate limit was exceeded. The limit window is fixed and resets at 00:00 UTC. Body is the standard ApiError; a Retry-After header carries the seconds until reset.",
+            "headers": {
+              "Retry-After": {
+                "required": false,
+                "schema": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
           }
         },
         "tags": [
@@ -1209,6 +2863,35 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/UploadResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "HTTP 403 Forbidden — a valid API key with no active subscription called a gated endpoint. Body is the standard ApiError with error=\"subscription_required\".",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "HTTP 429 Too Many Requests — a per-endpoint daily rate limit was exceeded. The limit window is fixed and resets at 00:00 UTC. Body is the standard ApiError; a Retry-After header carries the seconds until reset.",
+            "headers": {
+              "Retry-After": {
+                "required": false,
+                "schema": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
                 }
               }
             }
@@ -1252,11 +2935,135 @@
         ]
       }
     },
+    "/v1/videos/download/instagram": {
+      "post": {
+        "operationId": "downloadInstagramVideo",
+        "summary": "Import an Instagram video into VidJutsu",
+        "description": "Imports the primary video from an Instagram post or reel into tenant-owned VidJutsu storage. Repeated imports reuse the same immutable asset.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SocialVideoDownloadResult"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "HTTP 403 Forbidden — a valid API key with no active subscription called a gated endpoint. Body is the standard ApiError with error=\"subscription_required\".",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "HTTP 429 Too Many Requests — a per-endpoint daily rate limit was exceeded. The limit window is fixed and resets at 00:00 UTC. Body is the standard ApiError; a Retry-After header carries the seconds until reset.",
+            "headers": {
+              "Retry-After": {
+                "required": false,
+                "schema": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Videos"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SocialVideoDownloadRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/videos/download/tiktok": {
+      "post": {
+        "operationId": "downloadTikTokVideo",
+        "summary": "Import a TikTok video into VidJutsu",
+        "description": "Imports the primary video from a TikTok post into tenant-owned VidJutsu storage. Repeated imports reuse the same immutable asset.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SocialVideoDownloadResult"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "HTTP 403 Forbidden — a valid API key with no active subscription called a gated endpoint. Body is the standard ApiError with error=\"subscription_required\".",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "HTTP 429 Too Many Requests — a per-endpoint daily rate limit was exceeded. The limit window is fixed and resets at 00:00 UTC. Body is the standard ApiError; a Retry-After header carries the seconds until reset.",
+            "headers": {
+              "Retry-After": {
+                "required": false,
+                "schema": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Videos"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SocialVideoDownloadRequest"
+              }
+            }
+          }
+        }
+      }
+    },
     "/v1/watch": {
       "post": {
         "operationId": "watchMedia",
         "summary": "Watch media",
-        "description": "AI watches a video or image and answers your freeform prompt. Returns structured JSON. 10 credits.",
+        "description": "AI watches a video or image and answers your freeform prompt. Returns structured JSON. Daily limit: 50/day (resets 00:00 UTC).",
         "parameters": [],
         "responses": {
           "200": {
@@ -1265,6 +3072,35 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/WatchResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "HTTP 403 Forbidden — a valid API key with no active subscription called a gated endpoint. Body is the standard ApiError with error=\"subscription_required\".",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "HTTP 429 Too Many Requests — a per-endpoint daily rate limit was exceeded. The limit window is fixed and resets at 00:00 UTC. Body is the standard ApiError; a Retry-After header carries the seconds until reset.",
+            "headers": {
+              "Retry-After": {
+                "required": false,
+                "schema": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
                 }
               }
             }
@@ -1392,8 +3228,7 @@
         "type": "object",
         "required": [
           "id",
-          "status",
-          "creditsCharged"
+          "status"
         ],
         "properties": {
           "id": {
@@ -1403,12 +3238,6 @@
             "type": "string",
             "enum": [
               "draft"
-            ]
-          },
-          "creditsCharged": {
-            "type": "number",
-            "enum": [
-              0
             ]
           }
         }
@@ -1500,6 +3329,230 @@
           }
         }
       },
+      "AgentClaimCompleteRequest": {
+        "type": "object",
+        "required": [
+          "claim_token",
+          "code"
+        ],
+        "properties": {
+          "claim_token": {
+            "type": "string"
+          },
+          "code": {
+            "type": "string",
+            "description": "6-digit verification code emailed to the principal."
+          }
+        }
+      },
+      "AgentClaimCompleteResponse": {
+        "type": "object",
+        "required": [
+          "credential",
+          "credential_type",
+          "scopes"
+        ],
+        "properties": {
+          "credential": {
+            "type": "string",
+            "description": "Freshly-rotated API key. For anonymous registrations the original `vj_anon_*` key returned at signup is now invalid; agents MUST replace it with this value."
+          },
+          "credential_type": {
+            "type": "string",
+            "enum": [
+              "api_key"
+            ]
+          },
+          "credential_expires": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "scopes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "AgentClaimRequest": {
+        "type": "object",
+        "required": [
+          "claim_token",
+          "email"
+        ],
+        "properties": {
+          "claim_token": {
+            "type": "string",
+            "description": "Opaque claim_token returned from the initial /v1/auth/agent call."
+          },
+          "email": {
+            "type": "string",
+            "description": "Email address to send the verification code to."
+          }
+        }
+      },
+      "AgentClaimResponse": {
+        "type": "object",
+        "required": [
+          "registration_id",
+          "claim_attempt_id",
+          "status",
+          "expires_at"
+        ],
+        "properties": {
+          "registration_id": {
+            "type": "string"
+          },
+          "claim_attempt_id": {
+            "type": "string",
+            "description": "Identifier for this claim attempt."
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "initiated"
+            ]
+          },
+          "expires_at": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Unix epoch ms when this claim attempt expires."
+          }
+        }
+      },
+      "AgentRevokeResponse": {
+        "type": "object",
+        "required": [
+          "revoked"
+        ],
+        "properties": {
+          "revoked": {
+            "type": "boolean"
+          }
+        }
+      },
+      "AgentSignupAnonymousBody": {
+        "type": "object",
+        "required": [
+          "type"
+        ],
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "anonymous"
+            ]
+          },
+          "requested_credential_type": {
+            "type": "string",
+            "enum": [
+              "api_key"
+            ],
+            "description": "Requested credential type. Currently only api_key is supported."
+          }
+        }
+      },
+      "AgentSignupBody": {
+        "anyOf": [
+          {
+            "$ref": "#/components/schemas/AgentSignupAnonymousBody"
+          },
+          {
+            "$ref": "#/components/schemas/AgentSignupVerifiedEmailBody"
+          }
+        ]
+      },
+      "AgentSignupResponse": {
+        "type": "object",
+        "required": [
+          "registration_id",
+          "registration_type"
+        ],
+        "properties": {
+          "registration_id": {
+            "type": "string",
+            "description": "Server-generated registration id (rgn_...)."
+          },
+          "registration_type": {
+            "type": "string",
+            "enum": [
+              "anonymous",
+              "email-verification"
+            ],
+            "description": "How the registration was initiated."
+          },
+          "credential_type": {
+            "type": "string",
+            "enum": [
+              "api_key"
+            ],
+            "description": "Credential type returned, when issued immediately. Omitted on flows that require claim_token first."
+          },
+          "credential": {
+            "type": "string",
+            "description": "Live credential (API key) issued by the server, when one is issued immediately."
+          },
+          "credential_expires": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Unix epoch ms when the credential expires, or null/undefined for non-expiring keys."
+          },
+          "scopes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Scopes the credential is authorized for at issue time."
+          },
+          "post_claim_scopes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Scopes that will be added after the claim flow completes."
+          },
+          "claim_url": {
+            "type": "string",
+            "description": "URL the agent should direct the principal to in order to complete claim/verification."
+          },
+          "claim_token": {
+            "type": "string",
+            "description": "Opaque token used to complete the claim flow."
+          },
+          "claim_token_expires": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Unix epoch ms when the claim_token expires."
+          }
+        }
+      },
+      "AgentSignupVerifiedEmailBody": {
+        "type": "object",
+        "required": [
+          "type",
+          "assertion_type",
+          "assertion"
+        ],
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "identity_assertion"
+            ]
+          },
+          "assertion_type": {
+            "type": "string",
+            "enum": [
+              "verified_email"
+            ]
+          },
+          "assertion": {
+            "type": "string",
+            "description": "Email address the agent asserts on behalf of the principal."
+          }
+        }
+      },
       "ApiError": {
         "type": "object",
         "required": [
@@ -1577,10 +3630,6 @@
           },
           "clientId": {
             "type": "string"
-          },
-          "balance": {
-            "type": "integer",
-            "format": "int32"
           },
           "isNew": {
             "type": "boolean"
@@ -1800,6 +3849,35 @@
         },
         "description": ""
       },
+      "Character": {
+        "type": "object",
+        "required": [
+          "id",
+          "imageUrl",
+          "model",
+          "createdAt"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Persisted character id (char_...)."
+          },
+          "imageUrl": {
+            "type": "string",
+            "format": "uri",
+            "description": "HTTPS CDN URL of the character image."
+          },
+          "model": {
+            "type": "string",
+            "description": "Provider model id that produced the image."
+          },
+          "createdAt": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Creation timestamp, epoch milliseconds."
+          }
+        }
+      },
       "CheckRequest": {
         "type": "object",
         "required": [
@@ -1888,6 +3966,188 @@
             "items": {
               "type": "string"
             }
+          }
+        }
+      },
+      "CloneCheckRequest": {
+        "type": "object",
+        "required": [
+          "videoUrl"
+        ],
+        "properties": {
+          "videoUrl": {
+            "type": "string",
+            "format": "uri",
+            "description": "Public HTTPS URL of the source video to evaluate. http:// URLs are rejected."
+          },
+          "context": {
+            "type": "string",
+            "description": "Optional freeform context about the intended clone (product, character, constraints) to sharpen the analysis."
+          }
+        }
+      },
+      "CloneCheckResponse": {
+        "type": "object",
+        "required": [
+          "verdict",
+          "score",
+          "evidence",
+          "model"
+        ],
+        "properties": {
+          "verdict": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CloneCheckVerdict"
+              }
+            ],
+            "description": "Overall cloneability verdict: \"strong\" clones reliably, \"possible\" may need retries or manual QA, \"weak\" is unlikely to clone well."
+          },
+          "score": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0,
+            "maximum": 100,
+            "description": "Cloneability score from 0 (unusable) to 100 (ideal source)."
+          },
+          "evidence": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Concrete observations from the video that support the verdict."
+          },
+          "model": {
+            "type": "string",
+            "description": "Provider model id that produced the analysis."
+          }
+        }
+      },
+      "CloneCheckVerdict": {
+        "type": "string",
+        "enum": [
+          "strong",
+          "possible",
+          "weak"
+        ]
+      },
+      "CloneStartingImageRequest": {
+        "type": "object",
+        "required": [
+          "firstFrame",
+          "characterId",
+          "prompt"
+        ],
+        "properties": {
+          "firstFrame": {
+            "type": "string",
+            "format": "uri",
+            "description": "Public HTTPS URL of the source video's extracted first-frame image. This image supplies the pose, framing, lighting, background, and composition to preserve. http:// URLs are rejected."
+          },
+          "characterId": {
+            "type": "string",
+            "description": "Id of a previously created character (from createCharacter or GET /v1/characters) whose stored image supplies the replacement identity."
+          },
+          "prompt": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Instructions for composing the starting frame (pose, framing, scene)."
+          }
+        }
+      },
+      "CloneVideoAccepted": {
+        "type": "object",
+        "required": [
+          "id",
+          "status"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Clone task id. Poll GET /v1/clones/video/{id} with it."
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "processing"
+            ],
+            "description": "Always \"processing\" on acceptance."
+          }
+        }
+      },
+      "CloneVideoModel": {
+        "type": "string",
+        "enum": [
+          "kling"
+        ]
+      },
+      "CloneVideoRequest": {
+        "type": "object",
+        "required": [
+          "startingImageUrl",
+          "sourceVideoUrl"
+        ],
+        "properties": {
+          "startingImageUrl": {
+            "type": "string",
+            "format": "uri",
+            "description": "Public HTTPS URL of the starting frame that carries the target identity. http:// URLs are rejected."
+          },
+          "sourceVideoUrl": {
+            "type": "string",
+            "format": "uri",
+            "description": "Public HTTPS URL of the source video whose motion is cloned. http:// URLs are rejected."
+          },
+          "model": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CloneVideoModel"
+              }
+            ],
+            "description": "Generation model. Only \"kling\" is supported: Kling 3.0 Motion Control puppets the character image with the source video's motion and keeps the original sound.",
+            "default": "kling"
+          },
+          "prompt": {
+            "type": "string",
+            "description": "Optional override for the default motion-control prompt."
+          }
+        }
+      },
+      "CloneVideoStatus": {
+        "type": "string",
+        "enum": [
+          "processing",
+          "completed",
+          "failed"
+        ]
+      },
+      "CloneVideoStatusResponse": {
+        "type": "object",
+        "required": [
+          "id",
+          "status"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Clone task id."
+          },
+          "status": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CloneVideoStatus"
+              }
+            ],
+            "description": "Current task status."
+          },
+          "videoUrl": {
+            "type": "string",
+            "format": "uri",
+            "description": "HTTPS URL of the finished clone. Present only when status is \"completed\"."
+          },
+          "error": {
+            "type": "string",
+            "description": "Failure explanation. Present only when status is \"failed\"."
           }
         }
       },
@@ -2120,48 +4380,54 @@
           }
         }
       },
-      "CreditCosts": {
+      "CreateCharacterRequest": {
         "type": "object",
         "required": [
-          "accounts.create",
-          "posts.create",
-          "watch",
-          "extract",
-          "transcribe",
-          "check"
+          "prompt"
         ],
         "properties": {
-          "accounts.create": {
-            "type": "integer",
-            "format": "int32",
-            "description": "Create account (free)"
+          "prompt": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Text description of the character to generate."
           },
-          "posts.create": {
-            "type": "integer",
-            "format": "int32",
-            "description": "Create post (free)"
-          },
-          "watch": {
-            "type": "integer",
-            "format": "int32",
-            "description": "Watch media via Gemini"
-          },
-          "extract": {
-            "type": "integer",
-            "format": "int32",
-            "description": "Extract frames/audio/metadata"
-          },
-          "transcribe": {
-            "type": "integer",
-            "format": "int32",
-            "description": "Transcribe speech to text"
-          },
-          "check": {
-            "type": "integer",
-            "format": "int32",
-            "description": "Check spec against rules"
+          "referenceImageUrl": {
+            "type": "string",
+            "format": "uri",
+            "description": "Optional public HTTPS URL of a reference image to guide identity. http:// URLs are rejected."
           }
         }
+      },
+      "CreateCharacterResponse": {
+        "type": "object",
+        "required": [
+          "id",
+          "imageUrl",
+          "model"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Persisted character id (char_...). Reuse it later via cloneStartingImage's characterId or GET /v1/characters/{id}."
+          },
+          "imageUrl": {
+            "type": "string",
+            "format": "uri",
+            "description": "HTTPS CDN URL of the generated character image."
+          },
+          "model": {
+            "type": "string",
+            "description": "Provider model id that produced the image."
+          }
+        }
+      },
+      "DailyLimits": {
+        "type": "object",
+        "additionalProperties": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "description": "Per-endpoint daily request limits, keyed by endpoint name (fixed window, resets 00:00 UTC)."
       },
       "DisclaimerRequest": {
         "type": "object",
@@ -2199,6 +4465,180 @@
           "resultUrl": {
             "type": "string",
             "description": "CDN URL of the disclaimed video"
+          }
+        }
+      },
+      "EditorProject": {
+        "type": "object",
+        "required": [
+          "projectId",
+          "clientId",
+          "name",
+          "status",
+          "createdAt",
+          "updatedAt"
+        ],
+        "properties": {
+          "projectId": {
+            "type": "string"
+          },
+          "clientId": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "project": {
+            "type": "object",
+            "additionalProperties": {},
+            "description": "The serializable timeline document (Twick ProjectJSON: tracks, assets,\nmetadata, version). Stored opaquely; the editor owns its shape."
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Tag"
+            }
+          },
+          "metadata": {
+            "type": "object",
+            "additionalProperties": {}
+          },
+          "status": {
+            "$ref": "#/components/schemas/EditorProjectStatus"
+          },
+          "createdAt": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "updatedAt": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "EditorProjectCreateRequest": {
+        "type": "object",
+        "required": [
+          "name"
+        ],
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "project": {
+            "type": "object",
+            "additionalProperties": {}
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Tag"
+            }
+          },
+          "metadata": {
+            "type": "object",
+            "additionalProperties": {}
+          }
+        }
+      },
+      "EditorProjectCreateResponse": {
+        "type": "object",
+        "required": [
+          "id",
+          "status"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "draft"
+            ]
+          }
+        }
+      },
+      "EditorProjectDeleteResponse": {
+        "type": "object",
+        "required": [
+          "id",
+          "status"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "archived"
+            ]
+          }
+        }
+      },
+      "EditorProjectListResponse": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EditorProject"
+            }
+          }
+        }
+      },
+      "EditorProjectStatus": {
+        "type": "string",
+        "enum": [
+          "draft",
+          "active",
+          "archived"
+        ]
+      },
+      "EditorProjectUpdateRequest": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/EditorProjectStatus"
+          },
+          "project": {
+            "type": "object",
+            "additionalProperties": {}
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Tag"
+            }
+          },
+          "metadata": {
+            "type": "object",
+            "additionalProperties": {}
+          }
+        }
+      },
+      "EditorProjectUpdateResponse": {
+        "type": "object",
+        "required": [
+          "projectId",
+          "updated"
+        ],
+        "properties": {
+          "projectId": {
+            "type": "string"
+          },
+          "updated": {
+            "type": "boolean",
+            "enum": [
+              true
+            ]
           }
         }
       },
@@ -2301,6 +4741,24 @@
           }
         }
       },
+      "GeneratedImageResponse": {
+        "type": "object",
+        "required": [
+          "imageUrl",
+          "model"
+        ],
+        "properties": {
+          "imageUrl": {
+            "type": "string",
+            "format": "uri",
+            "description": "HTTPS CDN URL of the generated image."
+          },
+          "model": {
+            "type": "string",
+            "description": "Provider model id that produced the image."
+          }
+        }
+      },
       "InfoResponse": {
         "type": "object",
         "required": [
@@ -2308,7 +4766,7 @@
           "version",
           "endpoints",
           "auth",
-          "credits"
+          "dailyLimits"
         ],
         "properties": {
           "name": {
@@ -2324,8 +4782,28 @@
             }
           },
           "auth": {},
-          "credits": {
-            "$ref": "#/components/schemas/CreditCosts"
+          "dailyLimits": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/DailyLimits"
+              }
+            ],
+            "description": "Per-endpoint daily request limits (fixed window, resets 00:00 UTC)."
+          }
+        }
+      },
+      "ListCharactersResponse": {
+        "type": "object",
+        "required": [
+          "characters"
+        ],
+        "properties": {
+          "characters": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Character"
+            },
+            "description": "Characters owned by the caller, most recent first."
           }
         }
       },
@@ -2453,8 +4931,7 @@
         "type": "object",
         "required": [
           "id",
-          "status",
-          "creditsCharged"
+          "status"
         ],
         "properties": {
           "id": {
@@ -2464,12 +4941,6 @@
             "type": "string",
             "enum": [
               "draft"
-            ]
-          },
-          "creditsCharged": {
-            "type": "number",
-            "enum": [
-              0
             ]
           }
         }
@@ -2560,23 +5031,25 @@
         "type": "object",
         "required": [
           "subscription",
-          "pricePerCredit",
           "maxAccounts",
-          "costs"
+          "dailyLimits"
         ],
         "properties": {
           "subscription": {
             "$ref": "#/components/schemas/SubscriptionInfo"
           },
-          "pricePerCredit": {
-            "type": "string"
-          },
           "maxAccounts": {
             "type": "integer",
-            "format": "int32"
+            "format": "int32",
+            "description": "Maximum managed accounts per subscription."
           },
-          "costs": {
-            "$ref": "#/components/schemas/CreditCosts"
+          "dailyLimits": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/DailyLimits"
+              }
+            ],
+            "description": "Per-endpoint daily request limits (fixed window, resets 00:00 UTC)."
           }
         }
       },
@@ -2653,8 +5126,7 @@
         "type": "object",
         "required": [
           "id",
-          "status",
-          "creditsCharged"
+          "status"
         ],
         "properties": {
           "id": {
@@ -2664,12 +5136,6 @@
             "type": "string",
             "enum": [
               "active"
-            ]
-          },
-          "creditsCharged": {
-            "type": "number",
-            "enum": [
-              0
             ]
           }
         }
@@ -2745,6 +5211,258 @@
           }
         }
       },
+      "ScrapeInstagramPostCommentsRequest": {
+        "type": "object",
+        "required": [
+          "url"
+        ],
+        "properties": {
+          "url": {
+            "type": "string",
+            "description": "Instagram post URL"
+          },
+          "cursor": {
+            "type": "string",
+            "description": "Pagination cursor"
+          }
+        }
+      },
+      "ScrapeInstagramPostRequest": {
+        "type": "object",
+        "required": [
+          "url"
+        ],
+        "properties": {
+          "url": {
+            "type": "string",
+            "description": "Instagram post or reel URL"
+          }
+        }
+      },
+      "ScrapeInstagramProfileRequest": {
+        "type": "object",
+        "required": [
+          "handle"
+        ],
+        "properties": {
+          "handle": {
+            "type": "string",
+            "description": "Instagram username (without @)"
+          }
+        }
+      },
+      "ScrapeInstagramUserPostsRequest": {
+        "type": "object",
+        "required": [
+          "handle"
+        ],
+        "properties": {
+          "handle": {
+            "type": "string",
+            "description": "Instagram username"
+          },
+          "cursor": {
+            "type": "string",
+            "description": "Pagination cursor"
+          }
+        }
+      },
+      "ScrapeInstagramUserReelsRequest": {
+        "type": "object",
+        "required": [
+          "handle"
+        ],
+        "properties": {
+          "handle": {
+            "type": "string",
+            "description": "Instagram username"
+          },
+          "cursor": {
+            "type": "string",
+            "description": "Pagination cursor"
+          }
+        }
+      },
+      "ScrapeResponse": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "description": "Pass-through response from Scrape Creators. Shape varies per endpoint. Media URLs are the raw provider source URLs; scrape never stages media. To stage a specific video's file, call the single-video download endpoint."
+          }
+        }
+      },
+      "ScrapeTikTokProfileRequest": {
+        "type": "object",
+        "required": [
+          "handle"
+        ],
+        "properties": {
+          "handle": {
+            "type": "string",
+            "description": "TikTok username (without @)"
+          },
+          "trim": {
+            "type": "boolean",
+            "description": "Reduce response size by trimming large fields"
+          }
+        }
+      },
+      "ScrapeTikTokProfileVideosRequest": {
+        "type": "object",
+        "required": [
+          "handle"
+        ],
+        "properties": {
+          "handle": {
+            "type": "string",
+            "description": "TikTok username"
+          },
+          "cursor": {
+            "type": "string",
+            "description": "Pagination cursor"
+          }
+        }
+      },
+      "ScrapeTikTokSearchUsersRequest": {
+        "type": "object",
+        "required": [
+          "query"
+        ],
+        "properties": {
+          "query": {
+            "type": "string",
+            "description": "Search query"
+          },
+          "cursor": {
+            "type": "string",
+            "description": "Pagination cursor"
+          }
+        }
+      },
+      "ScrapeTikTokTrendingRequest": {
+        "type": "object",
+        "properties": {
+          "country": {
+            "type": "string",
+            "description": "Two-letter ISO country code (e.g. 'us')"
+          }
+        }
+      },
+      "ScrapeTikTokVideoCommentsRequest": {
+        "type": "object",
+        "required": [
+          "url"
+        ],
+        "properties": {
+          "url": {
+            "type": "string",
+            "description": "TikTok video URL"
+          },
+          "cursor": {
+            "type": "string",
+            "description": "Pagination cursor"
+          }
+        }
+      },
+      "ScrapeTikTokVideoRequest": {
+        "type": "object",
+        "required": [
+          "url"
+        ],
+        "properties": {
+          "url": {
+            "type": "string",
+            "description": "TikTok video URL"
+          },
+          "trim": {
+            "type": "boolean",
+            "description": "Reduce response size"
+          }
+        }
+      },
+      "ScrapeTikTokVideoTranscriptRequest": {
+        "type": "object",
+        "required": [
+          "url"
+        ],
+        "properties": {
+          "url": {
+            "type": "string",
+            "description": "TikTok video URL"
+          }
+        }
+      },
+      "SocialVideoDownloadRequest": {
+        "type": "object",
+        "required": [
+          "url"
+        ],
+        "properties": {
+          "url": {
+            "type": "string",
+            "format": "uri"
+          }
+        }
+      },
+      "SocialVideoDownloadResult": {
+        "type": "object",
+        "required": [
+          "assetId",
+          "url",
+          "platform",
+          "externalId",
+          "sourceUrl",
+          "contentType",
+          "size",
+          "sha256",
+          "reused"
+        ],
+        "properties": {
+          "assetId": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string",
+            "format": "uri"
+          },
+          "platform": {
+            "$ref": "#/components/schemas/SocialVideoPlatform"
+          },
+          "externalId": {
+            "type": "string"
+          },
+          "sourceUrl": {
+            "type": "string",
+            "format": "uri"
+          },
+          "contentType": {
+            "type": "string",
+            "enum": [
+              "video/mp4"
+            ]
+          },
+          "size": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "sha256": {
+            "type": "string"
+          },
+          "reused": {
+            "type": "boolean"
+          }
+        }
+      },
+      "SocialVideoPlatform": {
+        "type": "string",
+        "enum": [
+          "tiktok",
+          "instagram"
+        ]
+      },
       "SubscriptionCreateRequest": {
         "type": "object",
         "required": [
@@ -2775,19 +5493,16 @@
         "type": "object",
         "required": [
           "price",
-          "includedCredits",
           "required"
         ],
         "properties": {
           "price": {
-            "type": "string"
-          },
-          "includedCredits": {
-            "type": "integer",
-            "format": "int32"
+            "type": "string",
+            "description": "Flat subscription price, e.g. \"$99/mo\"."
           },
           "required": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Whether an active subscription is required for gated endpoints."
           }
         }
       },
@@ -3019,6 +5734,7 @@
           },
           "prompt": {
             "type": "string",
+            "minLength": 1,
             "description": "Freeform prompt — tell AI what to look for"
           }
         }

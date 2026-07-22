@@ -1,5 +1,6 @@
 import { defineCommand } from "citty";
 import { publicRequest, setApiKey, CONFIG_FILE } from "../client";
+import { validateSubscribeArgs } from "../command-args";
 
 function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -8,14 +9,11 @@ function sleep(ms: number): Promise<void> {
 export default defineCommand({
   meta: { name: "subscribe", description: "Subscribe to VidJutsu ($99/mo)" },
   args: {
-    email: { type: "string", description: "Email for checkout", required: true },
+    email: { type: "string", description: "Email for a new checkout" },
     claim: { type: "string", description: "Claim token to resume polling (claim_xxx)" },
   },
   async run({ args }) {
-    if (!args.email) {
-      console.error("Email is required. Usage: vidjutsu subscribe --email you@example.com");
-      process.exit(1);
-    }
+    validateSubscribeArgs(args);
 
     let claimToken: string;
 
@@ -23,7 +21,7 @@ export default defineCommand({
       claimToken = args.claim;
     } else {
       const checkout = (await publicRequest("POST", "/v1/subscribe", {
-        email: args.email,
+        email: args.email!,
       })) as { url: string; claimToken: string };
 
       claimToken = checkout.claimToken;
