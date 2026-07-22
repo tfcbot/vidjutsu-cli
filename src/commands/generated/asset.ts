@@ -1,6 +1,7 @@
-// AUTO-GENERATED — do not edit. Run `bun run codegen` to regenerate.
+// Generated from OpenAPI with CLI-specific argument coercion.
 import { defineCommand } from "citty";
 import { apiRequest } from "../../client";
+import { parseJsonObject } from "../../command-args";
 
 function parseTags(raw?: string): Array<{ key: string; value: string }> | undefined {
   if (!raw) return undefined;
@@ -29,7 +30,8 @@ export default defineCommand({
         if (args["contentType"] !== undefined) body["contentType"] = args["contentType"];
         const tags = parseTags(args.tags as string | undefined);
         if (tags) body.tags = tags;
-        if (args["metadata"] !== undefined) body["metadata"] = args["metadata"];
+        const metadata = parseJsonObject(args.metadata, "--metadata");
+        if (metadata !== undefined) body.metadata = metadata;
         const result = await apiRequest("POST", "/v1/assets", body);
         console.log(JSON.stringify(result, null, 2));
       },
@@ -47,7 +49,8 @@ export default defineCommand({
         if (args["name"] !== undefined) body["name"] = args["name"];
         const tags = parseTags(args.tags as string | undefined);
         if (tags) body.tags = tags;
-        if (args["metadata"] !== undefined) body["metadata"] = args["metadata"];
+        const metadata = parseJsonObject(args.metadata, "--metadata");
+        if (metadata !== undefined) body.metadata = metadata;
         const result = await apiRequest("PUT", "/v1/assets?id=" + args.id, body);
         console.log(JSON.stringify(result, null, 2));
       },

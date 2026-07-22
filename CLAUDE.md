@@ -13,12 +13,15 @@
 Releases are triggered by pushing a `v*` tag to main. The GitHub Actions workflow builds standalone Bun binaries for all platforms and publishes a GitHub Release with checksums.
 
 To release:
-1. Bump version in `package.json`, `src/index.ts`, and `src/commands/update.ts`
-2. Merge the version bump PR
-3. Tag main: `git tag v<version> && git push origin v<version>`
+1. Bump the same version in `package.json` and `src/version.ts`
+2. Run `bun run check` (this enforces the version invariant)
+3. Merge the release PR
+4. Tag the merged commit: `git tag v<version> && git push origin v<version>`
 
 ## Build
 
 - `bun run build` — bundle to dist/index.mjs
 - `bun run build:binary` — compile standalone binaries for all platforms
+- `bun test` — run focused contract and parser tests
+- `bun run check` — enforce version parity, test, and build
 - `bun run dev` — run from source

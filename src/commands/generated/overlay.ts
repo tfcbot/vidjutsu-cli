@@ -1,6 +1,7 @@
-// AUTO-GENERATED — do not edit. Run `bun run codegen` to regenerate.
+// Generated from OpenAPI with CLI-specific argument coercion.
 import { defineCommand } from "citty";
 import { apiRequest } from "../../client";
+import { buildOverlayBody } from "../../command-args";
 
 export default defineCommand({
   meta: { name: "overlay", description: "Burn text overlay onto video" },
@@ -12,12 +13,13 @@ export default defineCommand({
     "strokeThickness": { type: "string", description: "Text outline thickness (0-10). Defaults to 2." },
   },
   async run({ args }) {
-    const body: Record<string, unknown> = {};
-    if (args["videoUrl"] !== undefined) body["videoUrl"] = args["videoUrl"];
-    if (args["text"] !== undefined) body["text"] = args["text"];
-    if (args["position"] !== undefined) body["position"] = args["position"];
-    if (args["fontSize"] !== undefined) body["fontSize"] = args["fontSize"];
-    if (args["strokeThickness"] !== undefined) body["strokeThickness"] = args["strokeThickness"];
+    const body = buildOverlayBody({
+      videoUrl: args.videoUrl,
+      text: args.text,
+      position: args.position,
+      fontSize: args.fontSize,
+      strokeThickness: args.strokeThickness,
+    });
     const result = await apiRequest("POST", "/v1/overlay", body);
     console.log(JSON.stringify(result, null, 2));
   },

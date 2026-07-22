@@ -16,7 +16,10 @@ jobs:
         with:
           bun-version: '1.3.10'
 
-      - run: bun install
+      - run: bun install --frozen-lockfile
+
+      - name: Check source, tests, and version invariant
+        run: bun run check
 
       - name: Build standalone binaries
         run: bun run build:binary
