@@ -14,9 +14,8 @@ import {
 describe("clone endpoint contracts", () => {
   test("builds clone-check, character, and list contracts", () => {
     expect(CLONE_PATHS.check).toBe("/v1/clones/check");
-    expect(buildCloneCheckRequest("https://cdn.example/source.mp4", "product shot")).toEqual({
+    expect(buildCloneCheckRequest("https://cdn.example/source.mp4")).toEqual({
       videoUrl: "https://cdn.example/source.mp4",
-      context: "product shot",
     });
     expect(CLONE_PATHS.characters).toBe("/v1/characters");
     expect(buildCharacterRequest("a chef", "https://cdn.example/ref.png")).toEqual({
@@ -71,7 +70,6 @@ describe("clone endpoint contracts", () => {
       tiktokUrl: "https://www.tiktok.com/@creator/video/123",
       characterId: "char_123",
       prompt: "Keep pose and background",
-      context: "Use the product naturally",
       videoPrompt: "Preserve the original performance",
     });
 
@@ -86,7 +84,6 @@ describe("clone endpoint contracts", () => {
         path: "/v1/clones/check",
         body: {
           videoUrl: "https://cdn.example/source.mp4",
-          context: "Use the product naturally",
         },
       },
       {
@@ -114,5 +111,14 @@ describe("clone endpoint contracts", () => {
         },
       },
     ]);
+  });
+
+  test("clone-check rejects social post pages with a staging instruction", () => {
+    expect(() =>
+      buildCloneCheckRequest("https://www.tiktok.com/@creator/video/123"),
+    ).toThrow("downloaded/staged first");
+    expect(() =>
+      buildCloneCheckRequest("http://cdn.example/source.mp4"),
+    ).toThrow("public HTTPS MP4 URL");
   });
 });

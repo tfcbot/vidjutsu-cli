@@ -13,8 +13,31 @@ export type ApiRequester = (
   body?: unknown,
 ) => Promise<unknown>;
 
-export function buildCloneCheckRequest(videoUrl: string, context?: string) {
-  return context === undefined ? { videoUrl } : { videoUrl, context };
+function directHostedMp4Url(value: string): string {
+  let url: URL;
+  try {
+    url = new URL(value);
+  } catch {
+    throw new Error("videoUrl must be a public HTTPS MP4 URL");
+  }
+  if (url.protocol !== "https:" || url.username || url.password) {
+    throw new Error("videoUrl must be a public HTTPS MP4 URL");
+  }
+  const hostname = url.hostname.toLowerCase().replace(/\.$/, "");
+  if (
+    ["tiktok.com", "instagram.com"].some(
+      (host) => hostname === host || hostname.endsWith(`.${host}`),
+    )
+  ) {
+    throw new Error(
+      "Social post URLs must be downloaded/staged first; pass the returned CDN url to clone check",
+    );
+  }
+  return url.toString();
+}
+
+export function buildCloneCheckRequest(videoUrl: string) {
+  return { videoUrl: directHostedMp4Url(videoUrl) };
 }
 
 export function buildCharacterRequest(prompt: string, referenceImageUrl?: string) {
@@ -75,7 +98,6 @@ export interface TikTokCloneInput {
   tiktokUrl: string;
   characterId: string;
   prompt: string;
-  context?: string;
   videoPrompt?: string;
 }
 
@@ -88,7 +110,7 @@ export async function runTikTokClone(request: ApiRequester, input: TikTokCloneIn
   const check = await request(
     "POST",
     CLONE_PATHS.check,
-    buildCloneCheckRequest(sourceVideoUrl, input.context),
+    buildCloneCheckRequest(sourceVideoUrl),
   );
 
   const extraction = await request("POST", CLONE_PATHS.extract, {

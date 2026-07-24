@@ -21,10 +21,9 @@ export default defineCommand({
       meta: { name: "check", description: "Evaluate a staged video's cloneability" },
       args: {
         video: { type: "string", required: true, description: "Public HTTPS source video URL" },
-        context: { type: "string", description: "Optional cloning context" },
       },
       async run({ args }) {
-        print(await apiRequest("POST", CLONE_PATHS.check, buildCloneCheckRequest(args.video, args.context)));
+        print(await apiRequest("POST", CLONE_PATHS.check, buildCloneCheckRequest(args.video)));
       },
     }),
     character: defineCommand({
@@ -95,7 +94,6 @@ export default defineCommand({
         tiktok: { type: "string", required: true, description: "TikTok post URL" },
         character: { type: "string", required: true, description: "Persisted character ID" },
         prompt: { type: "string", required: true, description: "Starting-frame edit instructions" },
-        context: { type: "string", description: "Optional clone-check context" },
         "video-prompt": { type: "string", description: "Optional motion-control prompt" },
       },
       async run({ args }) {
@@ -103,7 +101,6 @@ export default defineCommand({
           tiktokUrl: args.tiktok,
           characterId: args.character,
           prompt: args.prompt,
-          context: args.context,
           videoPrompt: args["video-prompt"],
         }));
       },

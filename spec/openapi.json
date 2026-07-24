@@ -892,7 +892,7 @@
       "post": {
         "operationId": "cloneCheck",
         "summary": "Evaluate whether a source video can be cloned reliably",
-        "description": "Runs a synchronous, deterministic cloneability analysis of a staged source video and returns a verdict (strong, possible, or weak), a 0-100 score, and the evidence behind them, so the agent can branch on the result, for example stopping on a weak verdict. The videoUrl must be public HTTPS and staged first: provider CDNs cannot fetch TikTok or Instagram links directly, so download the source with /v1/videos/download/tiktok or /v1/videos/download/instagram before checking it. The source video must be at most ~2 minutes long. Shares the daily clone admission limit.",
+        "description": "Synchronously analyzes a directly fetchable public HTTPS MP4 and returns a verdict, score, evidence, and model. TikTok and Instagram post pages must first be staged with their video download endpoint, then the exact returned CDN URL passed as videoUrl. The source must be an MP4 no larger than 50 MB and no longer than 15 seconds. Captions and overlays that can be removed and reapplied do not independently reduce cloneability. Shares the daily clone admission limit.",
         "parameters": [],
         "responses": {
           "200": {
@@ -905,8 +905,48 @@
               }
             }
           },
+          "400": {
+            "description": "The URL is invalid or points to a TikTok/Instagram post page that must be staged first.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
           "403": {
             "description": "HTTP 403 Forbidden — a valid API key with no active subscription called a gated endpoint. Body is the standard ApiError with error=\"subscription_required\".",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "The fetched media exceeds the 50 MB clone-check limit.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "The URL did not resolve to an MP4 container.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "The MP4 exceeds the 15-second clone-source limit.",
             "content": {
               "application/json": {
                 "schema": {
@@ -2939,7 +2979,7 @@
       "post": {
         "operationId": "downloadInstagramVideo",
         "summary": "Import an Instagram video into VidJutsu",
-        "description": "Imports the primary video from an Instagram post or reel into tenant-owned VidJutsu storage. Repeated imports reuse the same immutable asset.",
+        "description": "Accepts an Instagram post or reel URL, extracts the primary MP4 and normalized metadata from one provider response, and stores the MP4 in tenant-owned VidJutsu storage. The tenant cache is checked first; repeated imports return the stored CDN URL and metadata without provider or media fetches. Older cached assets return metadata: {} and are not backfilled.",
         "parameters": [],
         "responses": {
           "200": {
@@ -3001,7 +3041,7 @@
       "post": {
         "operationId": "downloadTikTokVideo",
         "summary": "Import a TikTok video into VidJutsu",
-        "description": "Imports the primary video from a TikTok post into tenant-owned VidJutsu storage. Repeated imports reuse the same immutable asset.",
+        "description": "Accepts a TikTok post URL, extracts the primary MP4 and normalized metadata from one provider response, and stores the MP4 in tenant-owned VidJutsu storage. The tenant cache is checked first; repeated imports return the stored CDN URL and metadata without provider or media fetches. Older cached assets return metadata: {} and are not backfilled.",
         "parameters": [],
         "responses": {
           "200": {
@@ -3978,11 +4018,7 @@
           "videoUrl": {
             "type": "string",
             "format": "uri",
-            "description": "Public HTTPS URL of the source video to evaluate. http:// URLs are rejected."
-          },
-          "context": {
-            "type": "string",
-            "description": "Optional freeform context about the intended clone (product, character, constraints) to sharpen the analysis."
+            "description": "Public HTTPS URL of a directly fetchable MP4. Social post and webpage URLs must be staged first."
           }
         }
       },
@@ -4008,7 +4044,7 @@
             "format": "int32",
             "minimum": 0,
             "maximum": 100,
-            "description": "Cloneability score from 0 (unusable) to 100 (ideal source)."
+            "description": "Server-calculated cloneability score from 0 (unusable) to 100 (ideal source), derived from a fixed rubric."
           },
           "evidence": {
             "type": "array",
@@ -4019,7 +4055,7 @@
           },
           "model": {
             "type": "string",
-            "description": "Provider model id that produced the analysis."
+            "description": "Provider model id that produced the structured observations used by the server rubric."
           }
         }
       },
@@ -5418,7 +5454,8 @@
           "contentType",
           "size",
           "sha256",
-          "reused"
+          "reused",
+          "metadata"
         ],
         "properties": {
           "assetId": {
@@ -5453,6 +5490,61 @@
           },
           "reused": {
             "type": "boolean"
+          },
+          "metadata": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/SocialVideoMetadata"
+              }
+            ],
+            "description": "Normalized source metadata. Always present; older cached assets return an empty object."
+          }
+        }
+      },
+      "SocialVideoMetadata": {
+        "type": "object",
+        "properties": {
+          "caption": {
+            "type": "string",
+            "description": "Original post caption, when provided by the source."
+          },
+          "authorHandle": {
+            "type": "string",
+            "description": "Source account handle without the @ prefix."
+          },
+          "authorName": {
+            "type": "string",
+            "description": "Source account display name."
+          },
+          "hashtags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Unique hashtags parsed from the caption, without # prefixes."
+          },
+          "postedAt": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Source post timestamp in Unix epoch milliseconds."
+          },
+          "durationSeconds": {
+            "type": "number",
+            "format": "double",
+            "description": "Source video duration in seconds."
+          },
+          "coverUrl": {
+            "type": "string",
+            "format": "uri",
+            "description": "Source cover image URL."
+          },
+          "stats": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/SocialVideoStats"
+              }
+            ],
+            "description": "Available engagement counts from the source response."
           }
         }
       },
@@ -5462,6 +5554,27 @@
           "tiktok",
           "instagram"
         ]
+      },
+      "SocialVideoStats": {
+        "type": "object",
+        "properties": {
+          "views": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "likes": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "comments": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "shares": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
       },
       "SubscriptionCreateRequest": {
         "type": "object",
